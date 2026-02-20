@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primer on Diffusion Models | Abrar Zahin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    line-height: 1.7;
+    color: #1a1a1a;
+  }
+  h1 {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-family: 'Lora', serif;
+    margin-top: 2rem;
+  }
+  p {
+    margin-bottom: 1rem;
+  }
+  .meta {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  a {
+    color: #0070f3;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .back {
+    margin-top: 3rem;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<h1>Primer on Diffusion Models</h1>
+<div class="meta">September 2025 · 8 min read · Abrar Zahin</div>
+
+<p>
+Diffusion models are a class of generative models that learn to reverse a gradual noise corruption process.
+Instead of generating data in a single forward pass, they learn to iteratively denoise a sample.
+</p>
+
+<h2>1. Forward Process</h2>
+<p>
+The forward process gradually adds Gaussian noise to data over many timesteps until it becomes nearly pure noise.
+This process is fixed and does not require learning.
+</p>
+
+<h2>2. Reverse Process</h2>
+<p>
+A neural network is trained to predict and remove noise at each timestep.
+By reversing the noise process step-by-step, the model generates realistic samples.
+</p>
+
+<h2>3. Why It Works</h2>
+<p>
+Diffusion models are stable to train, scale well, and achieve high-quality sample generation.
+Modern image generators like Stable Diffusion are based on this principle.
+</p>
+
+<a class="back" href="../index.html">← Back to Notebook</a>
+
+</body>
+</html>
