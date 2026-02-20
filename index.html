@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notebook | Abrar Zahin</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.getElementById('post-view'), {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});">
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --bg: #ffffff; --code-bg: #f6f8fa; --link: #0070f3;
+    --accent: #0070f3; --toc-active: #0070f3; --hover-bg: #f9fafb;
+  }
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header { border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-weight: 700; font-size: 1.05rem; color: var(--text); cursor: pointer; }
+  nav { display: flex; gap: 1.5rem; align-items: center; }
+  nav a { font-size: 0.875rem; color: var(--text); }
+  nav a:hover { text-decoration: none; color: var(--accent); }
+  nav a.active { color: var(--accent); font-weight: 500; }
+
+  #listing-view { display: block; }
+  .page { max-width: 760px; margin: 0 auto; padding: 3.5rem 1.5rem; }
+  .page-header { margin-bottom: 2.5rem; }
+  .page-header h1 { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .page-header p { font-size: 0.9rem; color: var(--muted); }
+  .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.2rem; }
+  .filter-tag { font-size: 0.74rem; padding: 0.25rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); cursor: pointer; transition: all 0.15s; background: white; }
+  .filter-tag:hover, .filter-tag.active { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+  .post-list { display: flex; flex-direction: column; }
+  .post-item { padding: 1.5rem 0.75rem; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: start; transition: background 0.15s; color: inherit; border-radius: 4px; margin: 0 -0.75rem; cursor: pointer; }
+  .post-item:hover { background: var(--hover-bg); }
+  .post-item:first-child { border-top: 1px solid var(--border); }
+  .post-tags-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+  .post-tag { font-size: 0.68rem; padding: 0.15rem 0.55rem; background: #f3f4f6; border-radius: 999px; color: #6b7280; }
+  .post-tag.featured { background: #eff6ff; color: #3b82f6; }
+  .post-title { font-family: 'Lora', serif; font-size: 1.08rem; font-weight: 600; line-height: 1.35; margin-bottom: 0.4rem; color: var(--text); letter-spacing: -0.01em; }
+  .post-excerpt { font-size: 0.83rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.6rem; }
+  .post-meta { font-size: 0.74rem; color: var(--muted); display: flex; gap: 0.75rem; align-items: center; }
+  .post-meta-dot::before { content: '·'; margin-right: 0.75rem; }
+  .post-date { font-size: 0.76rem; color: var(--muted); white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+
+  #post-view { display: none; }
+  .breadcrumb { max-width: 1080px; margin: 0 auto; padding: 0.9rem 1.5rem 0; font-size: 0.78rem; color: var(--muted); display: flex; gap: 0.4rem; align-items: center; }
+  .breadcrumb span { color: var(--muted); cursor: pointer; }
+  .breadcrumb span:hover { color: var(--text); }
+  .breadcrumb-sep { color: var(--border); }
+  .page-layout { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 3rem; display: grid; grid-template-columns: 1fr 210px; gap: 4rem; align-items: start; }
+  .article-meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 2rem; }
+  .article-meta span + span::before { content: ' | '; }
+  .article-title { font-family: 'Lora', Georgia, serif; font-size: 1.9rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .article-subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.8rem; font-style: italic; }
+  .abstract-box { border: 1px solid var(--border); border-radius: 6px; padding: 1.1rem 1.3rem; margin: 1.5rem 0 2rem; background: #fafafa; }
+  .abstract-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; }
+  .abstract-box p { font-size: 0.86rem; line-height: 1.7; color: #374151; margin: 0; }
+  .keywords { font-size: 0.8rem; color: var(--muted); margin-bottom: 2rem; }
+  .keywords strong { color: var(--text); }
+  .note-box { background: #eff6ff; border-left: 3px solid #3b82f6; padding: 0.7rem 1rem; font-size: 0.82rem; color: #1e40af; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
+  .warning-box { background: #fefce8; border-left: 3px solid #fbbf24; padding: 0.7rem 1rem; font-size: 0.82rem; color: #92400e; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
+  .article-body h1 { font-family: 'Lora', serif; font-size: 1.42rem; font-weight: 600; margin: 2.6rem 0 0.9rem; scroll-margin-top: 68px; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+  .article-body h2 { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 600; margin: 1.9rem 0 0.6rem; scroll-margin-top: 68px; }
+  .article-body p { font-size: 0.94rem; margin-bottom: 1rem; color: #1f2937; line-height: 1.78; }
+  .article-body strong { font-weight: 600; }
+  .article-body em { font-style: italic; }
+  .article-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; background: var(--code-bg); padding: 0.1em 0.38em; border-radius: 3px; border: 1px solid #e2e8f0; color: #c7254e; }
+  .article-body pre { background: var(--code-bg) !important; border: 1px solid var(--border); border-radius: 6px; padding: 0 !important; overflow: hidden; margin: 1.2rem 0; }
+  .code-header { display: flex; justify-content: space-between; align-items: center; background: #f0f2f5; border-bottom: 1px solid var(--border); padding: 0.4rem 1rem; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .code-lang { background: #e5e7eb; padding: 1px 7px; border-radius: 3px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .article-body pre code { background: none !important; border: none !important; padding: 1rem 1.2rem !important; font-size: 0.8rem !important; color: #1a1a1a !important; display: block; overflow-x: auto; line-height: 1.6; }
+  .code-caption { font-size: 0.76rem; color: var(--muted); padding: 0.4rem 1rem; border-top: 1px solid var(--border); background: #fafafa; font-style: italic; }
+  .article-body ul, .article-body ol { padding-left: 1.6rem; margin-bottom: 1rem; }
+  .article-body li { font-size: 0.94rem; margin-bottom: 0.3rem; line-height: 1.7; }
+  .article-body hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  .part-divider { display: flex; align-items: center; gap: 1rem; margin: 3rem 0 2rem; }
+  .part-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .part-divider-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); white-space: nowrap; padding: 0.3rem 0.8rem; border: 1px solid var(--border); border-radius: 999px; background: #fafafa; }
+  .post-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .tag { font-size: 0.75rem; padding: 0.25rem 0.65rem; background: #f3f4f6; border-radius: 999px; color: #374151; cursor: pointer; }
+  .tag:hover { background: #e5e7eb; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--muted); cursor: pointer; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); width: 100%; }
+  .back-link:hover { color: var(--text); }
+  .sidebar { position: sticky; top: 72px; }
+  .toc-title { font-weight: 600; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 0.8rem; }
+  .toc { list-style: none; padding: 0; border-left: 1px solid var(--border); padding-left: 0.85rem; }
+  .toc li { margin-bottom: 0.42rem; line-height: 1.4; }
+  .toc a { color: var(--muted); font-size: 0.77rem; transition: color 0.15s; display: block; text-decoration: none; cursor: pointer; }
+  .toc a:hover, .toc a.active { color: var(--toc-active); }
+  .toc .toc-h2 { padding-left: 0.75rem; }
+  footer { border-top: 1px solid var(--border); padding: 1.5rem; text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 3rem; }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--text); }
+  @media (max-width: 768px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .article-title { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo" onclick="showListing()">Abrar Zahin</span>
+  <nav>
+    <a href="https://zahinabrar.github.io/">About</a>
+    <a href="https://zahinabrar.github.io/projects/">Projects</a>
+    <a href="https://zahinabrar.github.io/publications/">Publications</a>
+    <a href="#" class="active" onclick="showListing(); return false;">Notebook</a>
+  </nav>
+</header>
+
+<!-- ════════════════════════════════════════
+     LISTING VIEW
+     To add a new post:
+     1. Copy one .post-item block below
+     2. Change the onclick to showPost('your-post-id')
+     3. Update title, excerpt, tags, date
+     4. Add a new <div id="your-post-id"> in the POST SECTIONS below
+════════════════════════════════════════ -->
+<div id="listing-view">
+  <div class="page">
+    <div class="page-header">
+      <h1>Notebook</h1>
+      <p>Technical deep-dives on ML research, medical AI, and systems engineering.</p>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-tag active" onclick="filterPosts('all', this)">All</span>
+      <span class="filter-tag" onclick="filterPosts('MedAI', this)">Medical AI</span>
+      <span class="filter-tag" onclick="filterPosts('LLM', this)">LLMs</span>
+      <span class="filter-tag" onclick="filterPosts('Systems', this)">Systems</span>
+      <span class="filter-tag" onclick="filterPosts('Tutorial', this)">Tutorials</span>
+    </div>
+
+    <div class="post-list" id="postList">
+
+      <!-- POST CARD 1 — MedGemma -->
+      <div class="post-item" data-tags="MedAI LLM Tutorial" onclick="showPost('medgemma')">
+        <div>
+          <div class="post-tags-row">
+            <span class="post-tag featured">Medical AI</span>
+            <span class="post-tag">LLMs</span>
+            <span class="post-tag">Tutorial</span>
+          </div>
+          <div class="post-title">MedGemma (27B) QLoRA Fine-Tuning: Data Preprocessing Pipeline</div>
+          <div class="post-excerpt">A reproducible preprocessing pipeline for converting pathology-style text reports into instruction-formatted samples for causal LM fine-tuning — with 4-bit QLoRA, SLURM execution, and evaluation.</div>
+          <div class="post-meta">
+            <span>18 min read</span>
+            <span class="post-meta-dot">Mayo Clinic &amp; ASU</span>
+          </div>
+        </div>
+        <div style="text-align:right;padding-top:0.2rem;">
+          <div class="post-date">Jul 2025</div>
+        </div>
+      </div>
+
+      <!-- ADD NEW POST CARDS HERE — copy the block above -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     POST VIEW (wrapper)
+════════════════════════════════════════ -->
+<div id="post-view">
+  <div class="breadcrumb">
+    <span onclick="showListing()">Home</span>
+    <span class="breadcrumb-sep">›</span>
+    <span onclick="showListing()">Notebook</span>
+    <span class="breadcrumb-sep">›</span>
+    <span id="breadcrumb-title" style="color:var(--text);"></span>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       POST SECTIONS
+       Each post lives in a div with id="post-[name]"
+       Add new posts by copying one section below
+  ════════════════════════════════════════ -->
+
+  <!-- POST: medgemma -->
+  <div id="post-medgemma" style="display:none;">
+  <div class="page-layout">
+  <main>
+  <article>
+    <div class="article-meta">
+      <span>July 2025</span>
+      <span>18 min read</span>
+      <span>Abrar Zahin</span>
+      <span>Mayo Clinic &amp; ASU</span>
+    </div>
+    <h1 class="article-title">MedGemma (27B) QLoRA Fine-Tuning: Data Preprocessing Pipeline</h1>
+    <div class="article-subtitle">A privacy-preserving preprocessing and training pipeline for instruction-style fine-tuning of a large medical language model — with synthetic examples.</div>
+    <div class="abstract-box">
+      <div class="abstract-label">Abstract</div>
+      <p>This post documents a reproducible preprocessing pipeline for converting pathology-style text reports into instruction-formatted samples for causal language model (CLM) fine-tuning. It covers report cleaning, label extraction, prompt formatting, token-level label masking, and train/test export to JSONL. All examples are synthetic.</p>
+    </div>
+    <div class="keywords"><strong>Keywords:</strong> MedGemma, QLoRA, instruction tuning, preprocessing, CLM fine-tuning, pathology reports, JSONL</div>
+
+    <div class="article-body">
+
+      <h1 id="overview">1. Overview <a href="#overview" class="anchor">#</a></h1>
+      <p>This post documents the preprocessing workflow used to prepare report-style text for instruction-tuning of a causal LM. The pipeline is tailored for classification-style supervision while keeping the model objective consistent with CLM training.</p>
+      <ul>
+        <li><strong>Input:</strong> raw report text + target label (synthetic examples throughout).</li>
+        <li><strong>Output:</strong> instruction-formatted text and tokenized samples with masked labels.</li>
+        <li><strong>Export:</strong> train/test JSONL compatible with HuggingFace training scripts.</li>
+      </ul>
+      <div class="note-box">📝 <strong>Note:</strong> All examples are synthetic. In real deployment, preprocessing runs in a protected environment and no PHI leaves the secure boundary.</div>
+
+      <h1 id="data-schema">2. Data Schema (Synthetic) <a href="#data-schema" class="anchor">#</a></h1>
+      <ul>
+        <li><code>report_id</code> — unique identifier (string)</li>
+        <li><code>report_text</code> — report body (string)</li>
+        <li><code>label</code> — target class (string), e.g., <code>MASH</code>, <code>PBC</code>, <code>HCC</code></li>
+      </ul>
+
+      <h1 id="preprocessing">3. Preprocessing Steps <a href="#preprocessing" class="anchor">#</a></h1>
+
+      <h2 id="step1">Step 1: Clean and Normalize Text</h2>
+      <pre><div class="code-header"><span>clean_report.py</span><span class="code-lang">Python</span></div><code class="language-python">import re
+
+def clean_report(text: str) -> str:
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"(Report\s*ID:.*?\.)", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"(Patient\s*Name:.*?\.)", "", text, flags=re.IGNORECASE)
+    return text.strip()</code><div class="code-caption">Listing 1: Cleaning and normalization for report-style text.</div></pre>
+
+      <h2 id="step2">Step 2: Label Extraction (Optional)</h2>
+      <pre><div class="code-header"><span>extract_label.py</span><span class="code-lang">Python</span></div><code class="language-python">def extract_label_from_text(text: str):
+    patterns = [
+        r"Final Diagnosis:\s*(.*?)(?:\.|$)",
+        r"Diagnosis:\s*(.*?)(?:\.|$)",
+    ]
+    for p in patterns:
+        m = re.search(p, text, flags=re.IGNORECASE)
+        if m:
+            return m.group(1).strip()
+    return None</code><div class="code-caption">Listing 2: Heuristic label extraction (optional).</div></pre>
+
+      <h2 id="step3">Step 3: Instruction Formatting</h2>
+      <pre><div class="code-header"><span>format_instruction.py</span><span class="code-lang">Python</span></div><code class="language-python">def format_instruction(report_text: str, label: str) -> str:
+    instruction = "Classify the report into the correct diagnostic category."
+    return f"""### Instruction:
+{instruction}
+
+### Input:
+{report_text}
+
+### Response:
+{label}
+"""</code><div class="code-caption">Listing 3: Alpaca-style instruction-format prompt template.</div></pre>
+
+      <h2 id="step4">Step 4: Tokenization with Response-Only Loss Masking</h2>
+      <pre><div class="code-header"><span>tokenize.py</span><span class="code-lang">Python</span></div><code class="language-python">from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("google/medgemma-27b", use_fast=True)
+
+def tokenize_with_response_mask(text: str, max_length: int = 2048):
+    enc = tokenizer(text, truncation=True, max_length=max_length, padding=False)
+    input_ids = enc["input_ids"]
+    labels = input_ids.copy()
+    marker_ids = tokenizer("### Response:")["input_ids"]
+    marker_len = len(marker_ids)
+    start = None
+    for i in range(len(input_ids) - marker_len):
+        if input_ids[i:i+marker_len] == marker_ids:
+            start = i + marker_len
+            break
+    if start is None:
+        labels = [-100] * len(labels)
+    else:
+        labels[:start] = [-100] * start
+    enc["labels"] = labels
+    return enc</code><div class="code-caption">Listing 4: Tokenization and response-only loss masking.</div></pre>
+
+      <h2 id="step5">Step 5: Train/Test Split and JSONL Export</h2>
+      <pre><div class="code-header"><span>export.py</span><span class="code-lang">Python</span></div><code class="language-python">import json, pandas as pd
+from sklearn.model_selection import train_test_split
+
+def save_jsonl(text_list, path: str):
+    with open(path, "w") as f:
+        for t in text_list:
+            f.write(json.dumps({"text": t}) + "\n")
+
+df = pd.DataFrame({
+    "report_id": ["SYN-001", "SYN-002"],
+    "report_text": ["Final Diagnosis: MASH. Synthetic report...",
+                    "Final Diagnosis: PBC. Synthetic report..."],
+    "label": ["MASH", "PBC"]
+})
+df["clean_text"] = df["report_text"].apply(clean_report)
+df["formatted"] = df.apply(lambda r: format_instruction(r["clean_text"], r["label"]), axis=1)
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df["label"])
+save_jsonl(train_df["formatted"].tolist(), "train.jsonl")
+save_jsonl(test_df["formatted"].tolist(), "test.jsonl")</code><div class="code-caption">Listing 5: Stratified split and JSONL export.</div></pre>
+
+      <h1 id="quality-checks">4. Quality Checks <a href="#quality-checks" class="anchor">#</a></h1>
+      <ul>
+        <li>Verify label distribution after filtering/curation.</li>
+        <li>Confirm response tokens are unmasked and input tokens masked with <code>-100</code>.</li>
+        <li>Run a small batch through the tokenizer to validate max-length truncation.</li>
+        <li>Confirm JSONL integrity — one JSON object per line.</li>
+      </ul>
+
+      <h1 id="privacy">5. Privacy and Compliance Notes <a href="#privacy" class="anchor">#</a></h1>
+      <div class="warning-box">⚠️ In real usage, preprocessing runs in a controlled environment. Outputs must contain no raw report text or patient identifiers.</div>
+      <ul>
+        <li>All demonstrations are synthetic and public-safe.</li>
+        <li>Preprocessing runs in a secure enclave; data never leaves the protected boundary.</li>
+        <li>JSONL files contain only formatted instruction text, no PHI.</li>
+      </ul>
+
+      <div class="part-divider"><div class="part-divider-line"></div><div class="part-divider-label">Part 2 — QLoRA Training Setup</div><div class="part-divider-line"></div></div>
+
+      <h1 id="qlora-training">6. QLoRA Training Setup <a href="#qlora-training" class="anchor">#</a></h1>
+
+      <h2 id="dependencies">Dependencies</h2>
+      <pre><div class="code-header"><span>install</span><span class="code-lang">Bash</span></div><code class="language-bash">pip install -U "transformers>=4.45" "accelerate>=0.34" \
+               "datasets>=2.20" "peft>=0.12" "bitsandbytes>=0.43"</code><div class="code-caption">Required libraries for QLoRA training.</div></pre>
+
+      <h2 id="model-loading">Model Loading with 4-bit Quantization</h2>
+      <pre><div class="code-header"><span>load_model.py</span><span class="code-lang">Python</span></div><code class="language-python">import torch
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+from peft import LoraConfig, get_peft_model
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True, bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    "google/medgemma-27b", quantization_config=bnb_config, device_map="auto"
+)
+lora_config = LoraConfig(
+    r=16, lora_alpha=32, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM",
+    target_modules=["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"]
+)
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()</code><div class="code-caption">Listing 6: LoRA adapters on quantized base model. Trainable params ≈ 0.1% of total.</div></pre>
+
+      <h2 id="trainer-config">Trainer Configuration</h2>
+      <pre><div class="code-header"><span>train.py</span><span class="code-lang">Python</span></div><code class="language-python">from transformers import TrainingArguments, Trainer
+
+training_args = TrainingArguments(
+    output_dir="./medgemma-qlora",
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=8,
+    num_train_epochs=1, learning_rate=2e-4, bf16=True,
+    logging_steps=10, save_steps=200,
+    evaluation_strategy="steps", eval_steps=200,
+    save_total_limit=2, report_to="none"
+)
+trainer = Trainer(
+    model=model, args=training_args,
+    train_dataset=tokenized_dataset["train"],
+    eval_dataset=tokenized_dataset["test"],
+)
+trainer.train()</code><div class="code-caption">Listing 7: Minimal QLoRA training configuration.</div></pre>
+
+      <div class="part-divider"><div class="part-divider-line"></div><div class="part-divider-label">Part 3 — SLURM GPU Execution</div><div class="part-divider-line"></div></div>
+
+      <h1 id="slurm">7. SLURM GPU Execution <a href="#slurm" class="anchor">#</a></h1>
+
+      <h2 id="interactive-alloc">Interactive Allocation</h2>
+      <pre><div class="code-header"><span>slurm</span><span class="code-lang">Bash</span></div><code class="language-bash">srun --nodes=1 --gres=gpu:1 --partition=aivclung --pty /bin/bash</code><div class="code-caption">Request one GPU node interactively.</div></pre>
+
+      <h2 id="env-launch">Environment Setup</h2>
+      <pre><div class="code-header"><span>launch</span><span class="code-lang">Bash</span></div><code class="language-bash">micromamba activate medgemma310
+jupyter lab --no-browser --ip=0.0.0.0 --port=8888</code><div class="code-caption">Activate environment and launch Jupyter on the GPU node.</div></pre>
+
+      <h2 id="gpu-verify">GPU Verification</h2>
+      <pre><div class="code-header"><span>verify.py</span><span class="code-lang">Python</span></div><code class="language-python">import torch
+print(torch.cuda.is_available())      # True
+print(torch.cuda.get_device_name(0))  # e.g. NVIDIA A100 80GB</code><div class="code-caption">Sanity check to confirm GPU allocation.</div></pre>
+
+      <div class="part-divider"><div class="part-divider-line"></div><div class="part-divider-label">Part 4 — Evaluation &amp; Inference</div><div class="part-divider-line"></div></div>
+
+      <h1 id="evaluation">8. Evaluation and Inference <a href="#evaluation" class="anchor">#</a></h1>
+
+      <h2 id="generate-preds">Generate Predictions</h2>
+      <pre><div class="code-header"><span>inference.py</span><span class="code-lang">Python</span></div><code class="language-python">from transformers import pipeline
+
+pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0)
+sample_prompt = """### Instruction:
+Classify the report into the correct diagnostic category.
+
+### Input:
+Synthetic report text describing fibrosis and steatosis.
+
+### Response:
+"""
+output = pipe(sample_prompt, max_new_tokens=20)
+print(output[0]["generated_text"])</code><div class="code-caption">Example inference using the fine-tuned model.</div></pre>
+
+      <h2 id="exact-match">Exact Match Evaluation</h2>
+      <pre><div class="code-header"><span>evaluate.py</span><span class="code-lang">Python</span></div><code class="language-python">def extract_prediction(text):
+    return text.split("### Response:")[-1].strip()
+
+correct = 0
+for example in dataset["test"]:
+    prompt = example["text"].split("### Response:")[0] + "### Response:\n"
+    pred = pipe(prompt, max_new_tokens=10)[0]["generated_text"]
+    if extract_prediction(pred).startswith(extract_prediction(example["text"])):
+        correct += 1
+print(f"Accuracy: {correct / len(dataset['test']):.2%}")</code><div class="code-caption">Simple exact-match evaluation for classification-style fine-tuning.</div></pre>
+
+      <h1 id="summary">9. Summary <a href="#summary" class="anchor">#</a></h1>
+      <ul>
+        <li><strong>Instruction-style preprocessing</strong> with response-only loss masking.</li>
+        <li><strong>4-bit QLoRA fine-tuning</strong> of MedGemma (27B) using PEFT + BitsAndBytes.</li>
+        <li><strong>Secure GPU-node execution</strong> via SLURM on a clinical compute cluster.</li>
+        <li><strong>Post-training inference</strong> and exact-match evaluation on held-out test set.</li>
+      </ul>
+      <div class="note-box">All code examples are synthetic and structured for public documentation. The full pipeline runs in a secure, IRB-approved environment at Mayo Clinic.</div>
+
+      <hr>
+      <div class="post-tags">
+        <span class="tag" onclick="showListing()">MedGemma</span>
+        <span class="tag" onclick="showListing()">QLoRA</span>
+        <span class="tag" onclick="showListing()">Fine-Tuning</span>
+        <span class="tag" onclick="showListing()">PEFT</span>
+        <span class="tag" onclick="showListing()">Digital Pathology</span>
+        <span class="tag" onclick="showListing()">HuggingFace</span>
+        <span class="tag" onclick="showListing()">SLURM</span>
+      </div>
+      <div class="back-link" onclick="showListing()">← Back to all posts</div>
+    </div>
+  </article>
+  </main>
+
+  <aside class="sidebar">
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc">
+      <li><a onclick="tocScroll('overview')">1. Overview</a></li>
+      <li><a onclick="tocScroll('data-schema')">2. Data Schema</a></li>
+      <li><a onclick="tocScroll('preprocessing')">3. Preprocessing Steps</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('step1')">Step 1: Clean Text</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('step2')">Step 2: Label Extraction</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('step3')">Step 3: Instruction Format</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('step4')">Step 4: Loss Masking</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('step5')">Step 5: JSONL Export</a></li>
+      <li><a onclick="tocScroll('quality-checks')">4. Quality Checks</a></li>
+      <li><a onclick="tocScroll('privacy')">5. Privacy Notes</a></li>
+      <li><a onclick="tocScroll('qlora-training')">6. QLoRA Training</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('model-loading')">Model + LoRA</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('trainer-config')">Trainer Config</a></li>
+      <li><a onclick="tocScroll('slurm')">7. SLURM Execution</a></li>
+      <li><a onclick="tocScroll('evaluation')">8. Evaluation</a></li>
+      <li><a onclick="tocScroll('summary')">9. Summary</a></li>
+    </ul>
+  </aside>
+  </div>
+  </div>
+  <!-- ADD NEW POST SECTIONS HERE -->
+
+</div><!-- end post-view -->
+
+<footer>
+  © 2025 <a href="https://zahinabrar.github.io/">Abrar Zahin</a>
+  &nbsp;·&nbsp; PhD Candidate, Arizona State University
+</footer>
+
+<script>
+  // ── Navigation ──
+  function showListing() {
+    document.getElementById('listing-view').style.display = 'block';
+    document.getElementById('post-view').style.display = 'none';
+    document.title = 'Notebook | Abrar Zahin';
+    window.scrollTo(0, 0);
+  }
+
+  function showPost(id) {
+    // Hide all post sections
+    document.querySelectorAll('#post-view > div[id^="post-"]').forEach(p => p.style.display = 'none');
+    // Show the selected post
+    document.getElementById('post-' + id).style.display = 'block';
+    // Update breadcrumb
+    const titles = {
+      'medgemma': 'MedGemma QLoRA Fine-Tuning',
+      // Add new post titles here: 'your-post-id': 'Your Post Title'
+    };
+    document.getElementById('breadcrumb-title').textContent = titles[id] || id;
+    // Show post view
+    document.getElementById('listing-view').style.display = 'none';
+    document.getElementById('post-view').style.display = 'block';
+    document.title = (titles[id] || id) + ' | Abrar Zahin';
+    window.scrollTo(0, 0);
+    hljs.highlightAll();
+  }
+
+  function tocScroll(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function filterPosts(tag, el) {
+    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.post-item').forEach(post => {
+      const tags = post.dataset.tags || '';
+      post.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
+    });
+  }
+
+  // TOC scroll spy
+  window.addEventListener('scroll', () => {
+    if (document.getElementById('post-view').style.display === 'none') return;
+    const headings = document.querySelectorAll('.article-body h1[id], .article-body h2[id]');
+    let active = null;
+    headings.forEach(h => { if (h.getBoundingClientRect().top < 90) active = h.id; });
+    document.querySelectorAll('.toc a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('onclick') === `tocScroll('${active}')`);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
