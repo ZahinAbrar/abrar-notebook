@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Forward Process (Diffusion) — Mathematical Formulation | Abrar Zahin</title>
+<title>Diffusion Models — Forward & Reverse Process | Abrar Zahin</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
@@ -72,7 +72,15 @@
   .article-body ul, .article-body ol { padding-left: 1.6rem; margin-bottom: 1rem; }
   .article-body li { font-size: 0.95rem; margin-bottom: 0.35rem; line-height: 1.7; }
 
+  .article-body table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+  .article-body table th { padding: 0.75rem; text-align: left; border: 1px solid var(--border); background: #f3f4f6; font-weight: 600; }
+  .article-body table td { padding: 0.75rem; border: 1px solid var(--border); }
+  .article-body table tr:nth-child(even) { background: #f9fafb; }
+
   .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; background: #f3f4f6; border: 1px solid #e5e7eb; border-bottom-width: 2px; padding: 0.05em 0.35em; border-radius: 4px; }
+
+  .part-divider { border-top: 3px solid var(--border); margin: 3rem 0; padding-top: 0.5rem; }
+  .part-title { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
 
   .sidebar { position: sticky; top: 72px; }
   .toc-title { font-weight: 600; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 0.8rem; }
@@ -81,6 +89,7 @@
   .toc a { color: var(--muted); font-size: 0.78rem; transition: color 0.15s; display: block; text-decoration: none; cursor: pointer; }
   .toc a:hover, .toc a.active { color: var(--toc-active); }
   .toc .toc-h2 { padding-left: 0.75rem; }
+  .toc-part { font-weight: 600; color: var(--accent); margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.72rem; }
 
   .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); cursor: pointer; margin-top: 2.2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); width: 100%; }
   .back-link:hover { color: var(--text); text-decoration: none; }
@@ -110,7 +119,7 @@
   <span class="breadcrumb-sep">›</span>
   <a href="../index.html">Notebook</a>
   <span class="breadcrumb-sep">›</span>
-  <span style="color:var(--text);">Forward Process — Diffusion</span>
+  <span style="color:var(--text);">Diffusion Models — Complete Guide</span>
 </div>
 
 <div class="page-layout">
@@ -118,23 +127,28 @@
     <article>
       <div class="article-meta">
         <span>Feb 2026</span>
-        <span>Primer</span>
+        <span>Comprehensive Guide</span>
         <span>Abrar Zahin</span>
         <span>Diffusion Models</span>
       </div>
 
-      <h1 class="article-title">Forward Process (Diffusion) — Mathematical Formulation</h1>
-      <div class="article-subtitle">How diffusion models systematically add noise: step-by-step and in closed form.</div>
+      <h1 class="article-title">Diffusion Models — Forward & Reverse Process</h1>
+      <div class="article-subtitle">A comprehensive guide to understanding how diffusion models add and remove noise to generate realistic images.</div>
 
       <div class="abstract-box">
         <div class="abstract-label">Abstract</div>
-        <p>The forward process is the “easy” direction in diffusion: starting from a clean image $x_0$, we add small Gaussian noise over $T$ steps until we reach near-pure noise. This page summarizes the Markov step formulation, the reparameterized sampling form, and the closed-form jump from $x_0$ to $x_t$.</p>
+        <p>This comprehensive guide covers both the forward diffusion process (systematically adding noise) and the reverse denoising process (learning to remove noise with neural networks). Starting from a clean image $x_0$, we add Gaussian noise over $T$ steps until reaching pure noise, then learn to reverse this process to generate new realistic images from random noise.</p>
       </div>
 
       <div class="article-body">
 
-        <h1 id="overview">Overview</h1>
-        <p>The forward process is where we <strong>systematically add noise</strong> to an image over multiple steps. This is the “easy” direction — going from a clear image to pure noise.</p>
+        <!-- PART 1: FORWARD PROCESS -->
+        <div class="part-divider">
+          <div class="part-title">Part 1: Forward Process (Diffusion)</div>
+        </div>
+
+        <h1 id="overview-forward">Overview</h1>
+        <p>The forward process is where we <strong>systematically add noise</strong> to an image over multiple steps. This is the "easy" direction — going from a clear image to pure noise.</p>
 
         <h1 id="setup">Setup and Notation</h1>
         <h2 id="variables">Variables</h2>
@@ -163,7 +177,7 @@
         <h3 id="mean">The Mean: $\sqrt{1-\beta_t}\,x_{t-1}$</h3>
         <ul>
           <li>Scales the previous image slightly by $\sqrt{1-\beta_t}<1$</li>
-          <li>Makes “room” for noise to be added</li>
+          <li>Makes "room" for noise to be added</li>
         </ul>
 
         <div class="note-box">
@@ -226,9 +240,9 @@ t=1000: pure noise</code></pre>
 
         <pre><div class="code-header"><span>example decay</span><span class="code-lang">text</span></div><code>If βt=0.01 constant:
 α = 0.99
-ᾱ100  = 0.99^100  ≈ 0.366
-ᾱ500  = 0.99^500  ≈ 0.0066
-ᾱ1000 = 0.99^1000 ≈ 0.00004</code></pre>
+ᾱ100  = 0.99^100  ≈ 0.366
+ᾱ500  = 0.99^500  ≈ 0.0066
+ᾱ1000 = 0.99^1000 ≈ 0.00004</code></pre>
 
         <h1 id="interpret">Interpreting the Closed-Form Formula</h1>
 
@@ -276,9 +290,9 @@ x990 = 0.01 · x0 + 0.9999 · ε</code></pre>
         <pre><div class="code-header"><span>intuition</span><span class="code-lang">text</span></div><code>x1 = √(1-β1) x0 + √β1 ε1
 x2 = √(1-β2) x1 + √β2 ε2
 ⇒ x2 = √[(1-β1)(1-β2)] x0 + (combined noise terms)
-⇒ x2 = √ᾱ2 x0 + √(1-ᾱ2) ε</code></pre>
+⇒ x2 = √ᾱ2 x0 + √(1-ᾱ2) ε</code></pre>
 
-        <h1 id="properties">Properties of the Forward Process</h1>
+        <h1 id="properties-forward">Properties of the Forward Process</h1>
         <ul>
           <li><strong>Markov:</strong> $q(x_t\mid x_{t-1},\dots,x_0)=q(x_t\mid x_{t-1})$</li>
           <li><strong>Fixed:</strong> fully defined by $(x_0,\{\beta_t\},\varepsilon)$; no learning required</li>
@@ -287,13 +301,13 @@ x2 = √(1-β2) x1 + √β2 ε2
         </ul>
 
         <h1 id="timeline">Visual Timeline</h1>
-        <pre><div class="code-header"><span>timeline</span><span class="code-lang">text</span></div><code>t=0     ᾱ=1.00    [████████████████████] Clear photo
-t=250   ᾱ≈0.??    [████████████████░░░░] Slight noise
-t=500   ᾱ≈0.??    [████████░░░░░░░░░░░░] Barely recognizable
-t=750   ᾱ≈0.??    [████░░░░░░░░░░░░░░░░] Almost pure noise
-t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░░] Pure Gaussian noise</code></pre>
+        <pre><div class="code-header"><span>timeline</span><span class="code-lang">text</span></div><code>t=0     ᾱ=1.00    [████████████████████] Clear photo
+t=250   ᾱ≈0.??    [████████████████░░░░] Slight noise
+t=500   ᾱ≈0.??    [████████░░░░░░░░░░░░] Barely recognizable
+t=750   ᾱ≈0.??    [████░░░░░░░░░░░░░░░░] Almost pure noise
+t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░░] Pure Gaussian noise</code></pre>
 
-        <h1 id="training">Connection to Training</h1>
+        <h1 id="training-connection">Connection to Training</h1>
         <p>The forward process is not learned. Training uses it to generate pairs $(x_0,x_t,t,\varepsilon)$ efficiently:</p>
         <ol>
           <li>Sample a real image $x_0$</li>
@@ -302,7 +316,7 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░�
           <li>Train a network to predict $\varepsilon$ given $(x_t,t)$</li>
         </ol>
 
-        <h1 id="summary">Summary</h1>
+        <h1 id="summary-forward">Summary — Forward Process</h1>
         <ul>
           <li>Forward diffusion adds Gaussian noise over $T$ steps via $\beta_t$.</li>
           <li>Single step: $x_t=\sqrt{1-\beta_t}x_{t-1}+\sqrt{\beta_t}\varepsilon_t$.</li>
@@ -310,18 +324,379 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░�
           <li>$\bar\alpha_t=\prod_{i=1}^t (1-\beta_i)$ measures signal remaining.</li>
         </ul>
 
+        <!-- PART 2: REVERSE PROCESS -->
+        <div class="part-divider">
+          <div class="part-title">Part 2: Reverse Process (Denoising)</div>
+        </div>
+
+        <h1 id="overview-reverse">Overview</h1>
+        <p>The reverse process is the <strong>"hard" direction</strong> in diffusion models — learning to remove noise and generate realistic images. This is where the neural network comes in.</p>
+
+        <h2 id="goal-reverse">The Goal</h2>
+        <p>We want to reverse the forward process:</p>
+        <pre><div class="code-header"><span>process direction</span><span class="code-lang">text</span></div><code>Forward:  x₀ → x₁ → x₂ → ... → xₜ  (add noise, easy)
+Reverse:  xₜ → xₜ₋₁ → xₜ₋₂ → ... → x₀  (remove noise, hard!)</code></pre>
+
+        <h2 id="why-hard">Why is Reverse Hard?</h2>
+        <p>Given a noisy image $x_t$, there are <strong>infinite possible</strong> images $x_0$ that could have produced it after adding noise. The reverse process needs to figure out which one is most likely to be realistic.</p>
+
+        <h1 id="formulation">The Reverse Process Formula</h1>
+
+        <h2 id="probabilistic">Probabilistic Model</h2>
+        <p>We model the reverse step as a Gaussian distribution:</p>
+        <p><strong>$$p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t)\right)$$</strong></p>
+
+        <h3 id="notation-rev">Understanding the Notation</h3>
+        <ul>
+          <li><strong>$p_\theta$</strong>: probability distribution parameterized by $\theta$ (neural network weights)</li>
+          <li><strong>$\mu_\theta(x_t, t)$</strong>: the mean predicted by our neural network</li>
+          <li><strong>$\Sigma_\theta(x_t, t)$</strong>: the variance (often fixed in practice)</li>
+        </ul>
+
+        <div class="note-box">
+          The network learns to predict where the less-noisy image $x_{t-1}$ should be centered, given the current noisy image $x_t$ and timestep $t$.
+        </div>
+
+        <h1 id="network">What Does the Neural Network Learn?</h1>
+
+        <h2 id="predict-noise">Predicting Noise</h2>
+        <p>The key insight: the neural network learns to predict <strong>what noise was added</strong>.</p>
+
+        <p><strong>Network inputs:</strong></p>
+        <ul>
+          <li>$x_t$: the noisy image at timestep $t$</li>
+          <li>$t$: the timestep number itself</li>
+        </ul>
+
+        <p><strong>Network output:</strong></p>
+        <ul>
+          <li>$\varepsilon_\theta(x_t, t)$: predicted noise that was added</li>
+        </ul>
+
+        <h2 id="why-predict">Why Predict Noise?</h2>
+        <p>Both predicting noise and predicting the clean image work, but predicting noise is more stable in practice. Once we know the noise, we can compute the clean image:</p>
+
+        <p><strong>$$\hat{x}_0 = \frac{x_t - \sqrt{1-\bar\alpha_t} \cdot \varepsilon_\theta(x_t, t)}{\sqrt{\bar\alpha_t}}$$</strong></p>
+
+        <div class="note-box">
+          This comes from rearranging the forward process formula: $x_t = \sqrt{\bar\alpha_t} x_0 + \sqrt{1-\bar\alpha_t} \varepsilon$
+        </div>
+
+        <h2 id="why-timestep">Why Does the Network Need Timestep $t$?</h2>
+        <p>The network needs to know $t$ because the same noisy-looking image could be at different stages:</p>
+        <ul>
+          <li><strong>At $t=10$ (early):</strong> very little noise was added → predict small noise</li>
+          <li><strong>At $t=990$ (late):</strong> tons of noise was added → predict large noise</li>
+        </ul>
+
+        <p>Without knowing $t$, the network can't tell how aggressively to denoise!</p>
+
+        <div class="warning-box">
+          Think of it like: if someone shows you a blurry photo and asks "how much blur should I remove?", you need to know "how much blur was added" to give the right answer.
+        </div>
+
+        <h1 id="denoising">The Denoising Step</h1>
+
+        <p>To go from $x_t$ to $x_{t-1}$, we:</p>
+        <ol>
+          <li>Use the network to predict what noise was added: $\varepsilon_\theta(x_t, t)$</li>
+          <li>Use that to estimate what $x_0$ was</li>
+          <li>Add back a small controlled amount of noise for timestep $t-1$</li>
+        </ol>
+
+        <h2 id="formula">The Denoising Formula (DDPM)</h2>
+        <p><strong>$$x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{1-\alpha_t}{\sqrt{1-\bar\alpha_t}} \cdot \varepsilon_\theta(x_t, t) \right) + \sigma_t z$$</strong></p>
+
+        <p>Where $z \sim \mathcal{N}(0, I)$ is fresh random noise.</p>
+
+        <div class="note-box">
+          Don't worry about memorizing this formula — the key insight is: <strong>predict noise → subtract it → get less noisy image</strong>.
+        </div>
+
+        <h1 id="training">Training the Diffusion Model</h1>
+
+        <p>Training is beautifully simple once you understand the forward process!</p>
+
+        <h2 id="algorithm">The Training Algorithm</h2>
+
+        <p>Here's what happens for each training iteration:</p>
+
+        <ol>
+          <li><strong>Take a training image $x_0$</strong> (e.g., a photo of a cat)</li>
+          <li><strong>Pick a random timestep $t$</strong> from $\{1, 2, \dots, T\}$</li>
+          <li><strong>Sample random noise $\varepsilon$</strong> ~ $\mathcal{N}(0, I)$</li>
+          <li><strong>Create noisy image $x_t$</strong> using: $x_t = \sqrt{\bar\alpha_t} x_0 + \sqrt{1-\bar\alpha_t} \varepsilon$</li>
+          <li><strong>Feed $x_t$ and $t$ into network</strong> to get predicted noise: $\varepsilon_\theta(x_t, t)$</li>
+          <li><strong>Compare to actual noise:</strong> Loss $= ||\varepsilon - \varepsilon_\theta(x_t, t)||^2$</li>
+          <li><strong>Backpropagate and update weights</strong></li>
+          <li><strong>Repeat</strong> for millions of images and timesteps</li>
+        </ol>
+
+        <pre><div class="code-header"><span>training pseudocode</span><span class="code-lang">python</span></div><code>for batch in dataloader:
+    x0 = batch  # clean images
+    t = random.randint(1, T)  # random timestep
+    ε = torch.randn_like(x0)  # sample noise
+    
+    # Forward diffusion (instant jump)
+    xt = sqrt(alpha_bar[t]) * x0 + sqrt(1 - alpha_bar[t]) * ε
+    
+    # Predict noise
+    ε_pred = model(xt, t)
+    
+    # Compute loss
+    loss = MSE(ε, ε_pred)
+    
+    # Update model
+    loss.backward()
+    optimizer.step()</code></pre>
+
+        <h2 id="loss">The Training Loss</h2>
+        <p><strong>$$\mathcal{L}_{\text{simple}} = \mathbb{E}_{t,x_0,\varepsilon} \left[ ||\varepsilon - \varepsilon_\theta(x_t, t)||^2 \right]$$</strong></p>
+
+        <p>In plain English: "Expected squared difference between true noise and predicted noise"</p>
+
+        <h2 id="why-works">Why This Training Works</h2>
+        <p>By training on <strong>random timesteps</strong>, the network learns to denoise at ALL noise levels:</p>
+        <ul>
+          <li>Sometimes sees $t=10$ (barely noisy) → learns to remove tiny amounts</li>
+          <li>Sometimes sees $t=500$ (half noisy) → learns to remove moderate noise</li>
+          <li>Sometimes sees $t=990$ (almost pure noise) → learns to identify faint signals</li>
+        </ul>
+
+        <div class="note-box">
+          After training on millions of examples across all timesteps, the network becomes an expert noise predictor at every noise level!
+        </div>
+
+        <h2 id="no-reverse">Important: No Reverse Process During Training</h2>
+        <p>During training, we do NOT run the reverse denoising process. We only:</p>
+        <pre><div class="code-header"><span>training flow</span><span class="code-lang">text</span></div><code>x₀ (clean image)
+  ↓ (add noise via closed form - forward)
+xₜ (noisy image)
+  ↓ (feed to network)
+εθ(xₜ, t) (predicted noise)
+  ↓ (compare to true noise ε)
+Loss = ||ε - εθ(xₜ, t)||²</code></pre>
+
+        <p>We never try to reconstruct $x_0$ during training. We're just teaching the network to recognize noise patterns.</p>
+
+        <div class="warning-box">
+          The full reverse process $x_T → x_{T-1} → \dots → x_0$ only happens during generation/inference, after training is complete.
+        </div>
+
+        <h1 id="generation">Generation/Sampling - Creating New Images</h1>
+
+        <p>This is where we actually create new images from scratch!</p>
+
+        <h2 id="starting">Starting Point</h2>
+        <p>We begin with <strong>pure random noise</strong>:</p>
+        <p><strong>$$x_T \sim \mathcal{N}(0, I)$$</strong></p>
+        <p>This is just random static, no structure at all.</p>
+
+        <h2 id="loop">The Denoising Loop</h2>
+        <p>Iterate backwards from $t = T$ down to $t = 1$:</p>
+
+        <pre><div class="code-header"><span>sampling algorithm</span><span class="code-lang">python</span></div><code>xT = torch.randn(image_shape)  # start from noise
+
+for t in reversed(range(1, T+1)):
+    # 1. Predict noise
+    ε_pred = model(xt, t)
+    
+    # 2. Estimate clean image
+    x0_hat = (xt - sqrt(1 - alpha_bar[t]) * ε_pred) / sqrt(alpha_bar[t])
+    
+    # 3. Compute denoised image
+    if t > 1:
+        z = torch.randn_like(xt)
+        xt_prev = mu_theta(xt, t) + sigma[t] * z
+    else:
+        xt_prev = mu_theta(xt, t)  # no noise at final step
+    
+    xt = xt_prev
+
+x0 = xt  # final clean image</code></pre>
+
+        <h2 id="fresh-noise">Why Add Fresh Noise Back?</h2>
+        <p>This might seem weird — we just removed noise, why add some back?</p>
+
+        <p><strong>Key insight:</strong> We're not trying to perfectly reconstruct one specific $x_0$. We're trying to sample from the <strong>distribution</strong> of realistic images.</p>
+
+        <ul>
+          <li>At $t=990$: tons of uncertainty → add more noise (exploration)</li>
+          <li>At $t=10$: almost certain → add very little noise (refinement)</li>
+          <li>At $t=1$: $\sigma_1 \approx 0$ → no noise (final clean image)</li>
+        </ul>
+
+        <div class="note-box">
+          The variance schedule $\sigma_t$ decreases as $t → 0$. This maintains diversity and prevents overly deterministic outputs.
+        </div>
+
+        <h2 id="process-visual">The Full Process Visualized</h2>
+        <pre><div class="code-header"><span>generation timeline</span><span class="code-lang">text</span></div><code>t=1000: [pure noise] 
+          ↓ network predicts noise, subtract it
+t=999:  [99.9% noise, 0.1% structure]
+          ↓ network predicts noise, subtract it  
+t=998:  [99.8% noise, 0.2% structure]
+          ↓
+...       [gradually more structure appears]
+          ↓
+t=500:  [fuzzy shapes visible]
+          ↓
+t=100:  [clear but blurry image]
+          ↓
+t=10:   [sharp, detailed image]
+          ↓
+t=1:    [final clean image — a cat!]</code></pre>
+
+        <h2 id="many-steps">Why Many Steps?</h2>
+        <p>At each step, we denoise the image <strong>a little bit</strong>. The network asks: "how much noise do I need to remove to make this more realistic?"</p>
+
+        <p>The network can't jump from pure noise to clean image in one shot — it needs gradual refinement through ~1000 steps.</p>
+
+        <h1 id="why-realistic">Why Does It Generate Realistic Images?</h1>
+
+        <p>This is the most important conceptual question!</p>
+
+        <h2 id="learned">What the Network Actually Learned</h2>
+        <p>During training, the network saw millions of examples like:</p>
+
+        <pre><div class="code-header"><span>training examples</span><span class="code-lang">text</span></div><code>Example 1:
+Real cat photo → add noise → noisy cat at t=500
+Network learns: "at t=500, THIS noise pattern should be removed 
+                 from a noisy cat to get closer to a real cat"
+
+Example 2:
+Real dog photo → add noise → noisy dog at t=500
+Network learns: "at t=500, THIS noise pattern should be removed 
+                 from a noisy dog to get closer to a real dog"</code></pre>
+
+        <h2 id="key-insight">The Key Insight</h2>
+        <p>The network learned the <strong>distribution of realistic images</strong> by learning what noise patterns appear when you corrupt real images!</p>
+
+        <p>If you add noise to a real cat photo, the resulting noisy pattern has <strong>structure</strong> — faint edges, color correlations, texture hints from the underlying cat.</p>
+
+        <p>Random noise with no underlying image looks <strong>different</strong> from noise-corrupted real images.</p>
+
+        <div class="note-box">
+          <strong>The network learned:</strong> "This noisy pattern could plausibly come from a real image, so if I remove this specific noise, I'll get closer to something realistic."
+        </div>
+
+        <h2 id="generation-steps">During Generation - Step by Step</h2>
+        <p>When we start with pure random noise $x_T$:</p>
+
+        <ul>
+          <li><strong>Step 1 ($t=1000$):</strong> Network looks at random noise and thinks: "What slight structure could I add to make this look like it might have come from a real image with tons of noise?"</li>
+          <li><strong>Step 2 ($t=999$):</strong> Now there's a tiny hint of structure. Network thinks: "Given this slightly structured noise, what should I remove?"</li>
+          <li><strong>Step 500:</strong> Clear fuzzy shapes exist. Network thinks: "These fuzzy blobs could be a cat/dog/car. Let me enhance realistic features."</li>
+          <li><strong>Step 10:</strong> Nearly clean. Network thinks: "This almost looks like a real photo, just need to remove final artifacts."</li>
+        </ul>
+
+        <h2 id="manifold">The Manifold of Realistic Images</h2>
+        <p>The network is asking at each step:</p>
+
+        <p><em>"Given what I see now, what's the most likely realistic image that could have produced this when corrupted with noise?"</em></p>
+
+        <p>It's <strong>working backwards through the training data distribution</strong>. Since it was trained on real images, it naturally gravitates toward patterns that look like real images.</p>
+
+        <div class="note-box">
+          <strong>By learning to predict noise on real images, the network implicitly learned what realistic images look like.</strong> When it denoises during generation, it's pulling random noise toward the manifold of realistic images.
+        </div>
+
+        <h2 id="different">Why Different Images Each Time?</h2>
+        <p>The model learns the <strong>distribution</strong> $p(x)$ of realistic images, not specific individual images:</p>
+        <ul>
+          <li>During training: sees millions of cats, dogs, cars → learns "what makes an image realistic"</li>
+          <li>During generation: <strong>samples</strong> from this learned distribution</li>
+          <li>Each random noise $x_T$ leads to a different sample</li>
+        </ul>
+
+        <p>This is why diffusion models are <strong>generative models</strong> — they generate new samples from a distribution, not just memorize training data.</p>
+
+        <h1 id="train-vs-gen">Training vs Generation Summary</h1>
+
+        <table>
+          <tr>
+            <th>Aspect</th>
+            <th>Training</th>
+            <th>Generation</th>
+          </tr>
+          <tr>
+            <td><strong>Starting point</strong></td>
+            <td>Real image $x_0$</td>
+            <td>Random noise $x_T$</td>
+          </tr>
+          <tr>
+            <td><strong>Process</strong></td>
+            <td>Jump to $x_t$ (one step)</td>
+            <td>Iterative denoise (many steps)</td>
+          </tr>
+          <tr>
+            <td><strong>Ground truth</strong></td>
+            <td>Known noise $\varepsilon$</td>
+            <td>No ground truth</td>
+          </tr>
+          <tr>
+            <td><strong>Steps</strong></td>
+            <td>0 denoising steps</td>
+            <td>$T$ denoising steps</td>
+          </tr>
+          <tr>
+            <td><strong>Speed</strong></td>
+            <td>Fast (seconds per image)</td>
+            <td>Slow (~1000 steps)</td>
+          </tr>
+        </table>
+
+        <h1 id="properties-reverse">Properties of the Reverse Process</h1>
+
+        <ul>
+          <li><strong>Learned:</strong> Unlike the forward process, the reverse process must be learned by a neural network</li>
+          <li><strong>Approximate:</strong> $p_\theta(x_{t-1} | x_t)$ approximates the true reverse conditional</li>
+          <li><strong>Iterative:</strong> Requires $T$ sequential steps during generation</li>
+          <li><strong>Stochastic:</strong> Adds noise $z$ at each step to maintain diversity</li>
+        </ul>
+
+        <h1 id="summary-reverse">Summary — Reverse Process</h1>
+
+        <ul>
+          <li>Reverse process learns to <strong>remove noise step-by-step</strong></li>
+          <li>Neural network $\varepsilon_\theta(x_t, t)$ predicts <strong>added noise</strong></li>
+          <li>Training: randomly sample $(x_0, t, \varepsilon)$, minimize $||\varepsilon - \varepsilon_\theta(x_t, t)||^2$</li>
+          <li>Generation: start from $x_T \sim \mathcal{N}(0,I)$, iteratively denoise to $x_0$</li>
+          <li>Network learns <strong>distribution of realistic images</strong> by learning noise patterns</li>
+        </ul>
+
         <h1 id="formulas">Key Formulas Reference</h1>
-        <pre><div class="code-header"><span>reference</span><span class="code-lang">text</span></div><code>Sequential:
-q(xt | xt-1) = N(xt; √(1-βt) xt-1, βt I)
-xt = √(1-βt) xt-1 + √βt εt
+
+        <pre><div class="code-header"><span>complete reference</span><span class="code-lang">text</span></div><code>FORWARD PROCESS:
+Sequential:
+  q(xt | xt-1) = N(xt; √(1-βt) xt-1, βt I)
+  xt = √(1-βt) xt-1 + √βt εt
 
 Direct:
-q(xt | x0) = N(xt; √ᾱt x0, (1-ᾱt) I)
-xt = √ᾱt x0 + √(1-ᾱt) ε
+  q(xt | x0) = N(xt; √ᾱt x0, (1-ᾱt) I)
+  xt = √ᾱt x0 + √(1-ᾱt) ε
 
 Cumulative:
-αt = 1 - βt
-ᾱt = ∏_{i=1}^t αi</code></pre>
+  αt = 1 - βt
+  ᾱt = ∏_{i=1}^t αi
+
+REVERSE PROCESS:
+Model:
+  p_θ(x_{t-1} | x_t) = N(x_{t-1}; μ_θ(x_t,t), Σ_θ(x_t,t))
+
+Network:
+  ε_θ(x_t, t) → predicted noise
+
+Training:
+  L = E_{t,x₀,ε} [||ε - ε_θ(x_t, t)||²]
+
+Denoising (DDPM):
+  x_{t-1} = (1/√α_t)(x_t - ((1-α_t)/√(1-ᾱ_t))ε_θ(x_t,t)) + σ_t z
+
+Generation:
+  x_T ~ N(0,I)
+  for t=T,...,1: apply denoising step
+  return x_0</code></pre>
 
         <a class="back-link" href="../index.html">← Back to Notebook</a>
       </div>
@@ -331,7 +706,8 @@ Cumulative:
   <aside class="sidebar">
     <div class="toc-title">Table of Contents</div>
     <ul class="toc">
-      <li><a onclick="tocScroll('overview')">Overview</a></li>
+      <li class="toc-part">Part 1: Forward Process</li>
+      <li><a onclick="tocScroll('overview-forward')">Overview</a></li>
       <li><a onclick="tocScroll('setup')">Setup</a></li>
       <li><a onclick="tocScroll('sequential')">Sequential Process</a></li>
       <li class="toc-h2"><a onclick="tocScroll('single-step')">Single Step</a></li>
@@ -340,8 +716,27 @@ Cumulative:
       <li><a onclick="tocScroll('direct')">Closed-Form Jump</a></li>
       <li class="toc-h2"><a onclick="tocScroll('alpha-bar')">Alpha-bar</a></li>
       <li><a onclick="tocScroll('examples')">Examples</a></li>
-      <li><a onclick="tocScroll('properties')">Properties</a></li>
-      <li><a onclick="tocScroll('training')">Training Connection</a></li>
+      <li><a onclick="tocScroll('properties-forward')">Properties</a></li>
+      <li><a onclick="tocScroll('training-connection')">Training Connection</a></li>
+      <li><a onclick="tocScroll('summary-forward')">Summary</a></li>
+      
+      <li class="toc-part">Part 2: Reverse Process</li>
+      <li><a onclick="tocScroll('overview-reverse')">Overview</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('goal-reverse')">Goal</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('why-hard')">Why Hard?</a></li>
+      <li><a onclick="tocScroll('formulation')">Formula</a></li>
+      <li><a onclick="tocScroll('network')">Neural Network</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('predict-noise')">Predict Noise</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('why-timestep')">Why Timestep?</a></li>
+      <li><a onclick="tocScroll('training')">Training</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('algorithm')">Algorithm</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('no-reverse')">No Reverse</a></li>
+      <li><a onclick="tocScroll('generation')">Generation</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('loop')">Denoising Loop</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('fresh-noise')">Fresh Noise</a></li>
+      <li><a onclick="tocScroll('why-realistic')">Why Realistic?</a></li>
+      <li><a onclick="tocScroll('train-vs-gen')">Train vs Gen</a></li>
+      <li><a onclick="tocScroll('summary-reverse')">Summary</a></li>
       <li><a onclick="tocScroll('formulas')">Key Formulas</a></li>
     </ul>
   </aside>
