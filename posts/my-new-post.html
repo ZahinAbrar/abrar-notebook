@@ -1,80 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Primer on Diffusion Models | Abrar Zahin</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forward Process (Diffusion) — Mathematical Formulation | Abrar Zahin</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});">
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+  onload="hljs.highlightAll();"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-  body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    line-height: 1.7;
-    color: #1a1a1a;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --bg: #ffffff; --code-bg: #f6f8fa; --link: #0070f3;
+    --accent: #0070f3; --toc-active: #0070f3; --hover-bg: #f9fafb;
   }
-  h1 {
-    font-family: 'Lora', serif;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  h2 {
-    font-family: 'Lora', serif;
-    margin-top: 2rem;
-  }
-  p {
-    margin-bottom: 1rem;
-  }
-  .meta {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-  }
-  a {
-    color: #0070f3;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  .back {
-    margin-top: 3rem;
-    display: inline-block;
+  html { font-size: 16px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header { border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); z-index: 100; }
+  .logo { font-weight: 700; font-size: 1.05rem; color: var(--text); }
+  nav { display: flex; gap: 1.25rem; align-items: center; }
+  nav a { font-size: 0.875rem; color: var(--text); }
+  nav a:hover { text-decoration: none; color: var(--accent); }
+
+  .breadcrumb { max-width: 1080px; margin: 0 auto; padding: 0.9rem 1.5rem 0; font-size: 0.78rem; color: var(--muted); display: flex; gap: 0.4rem; align-items: center; }
+  .breadcrumb a { color: var(--muted); }
+  .breadcrumb a:hover { color: var(--text); text-decoration: none; }
+  .breadcrumb-sep { color: var(--border); }
+
+  .page-layout { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 3rem; display: grid; grid-template-columns: 1fr 240px; gap: 4rem; align-items: start; }
+  main { min-width: 0; }
+
+  .article-meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.6rem; }
+  .article-meta span + span::before { content: ' | '; }
+
+  .article-title { font-family: 'Lora', Georgia, serif; font-size: 1.95rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+  .article-subtitle { font-size: 0.92rem; color: var(--muted); margin-bottom: 1.8rem; font-style: italic; }
+
+  .abstract-box { border: 1px solid var(--border); border-radius: 6px; padding: 1.1rem 1.3rem; margin: 1.3rem 0 1.8rem; background: #fafafa; }
+  .abstract-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.5rem; }
+  .abstract-box p { font-size: 0.9rem; line-height: 1.75; color: #374151; }
+
+  .note-box { background: #eff6ff; border-left: 3px solid #3b82f6; padding: 0.75rem 1rem; font-size: 0.85rem; color: #1e40af; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
+  .warning-box { background: #fefce8; border-left: 3px solid #fbbf24; padding: 0.75rem 1rem; font-size: 0.85rem; color: #92400e; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
+
+  .article-body h1 { font-family: 'Lora', serif; font-size: 1.42rem; font-weight: 600; margin: 2.2rem 0 0.85rem; scroll-margin-top: 78px; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  .article-body h2 { font-family: 'Lora', serif; font-size: 1.12rem; font-weight: 600; margin: 1.7rem 0 0.55rem; scroll-margin-top: 78px; }
+  .article-body h3 { font-family: 'Inter', sans-serif; font-size: 0.98rem; font-weight: 600; margin: 1.2rem 0 0.45rem; scroll-margin-top: 78px; }
+  .article-body p { font-size: 0.95rem; margin-bottom: 0.95rem; color: #1f2937; line-height: 1.8; }
+  .article-body strong { font-weight: 600; }
+  .article-body em { font-style: italic; }
+
+  .article-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.83em; background: var(--code-bg); padding: 0.12em 0.38em; border-radius: 3px; border: 1px solid #e2e8f0; color: #c7254e; }
+  .article-body pre { background: var(--code-bg) !important; border: 1px solid var(--border); border-radius: 6px; padding: 0 !important; overflow: hidden; margin: 1.2rem 0; }
+  .code-header { display: flex; justify-content: space-between; align-items: center; background: #f0f2f5; border-bottom: 1px solid var(--border); padding: 0.45rem 1rem; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .code-lang { background: #e5e7eb; padding: 1px 7px; border-radius: 3px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .article-body pre code { background: none !important; border: none !important; padding: 1rem 1.2rem !important; font-size: 0.82rem !important; color: #111827 !important; display: block; overflow-x: auto; line-height: 1.65; }
+
+  .article-body ul, .article-body ol { padding-left: 1.6rem; margin-bottom: 1rem; }
+  .article-body li { font-size: 0.95rem; margin-bottom: 0.35rem; line-height: 1.7; }
+
+  .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; background: #f3f4f6; border: 1px solid #e5e7eb; border-bottom-width: 2px; padding: 0.05em 0.35em; border-radius: 4px; }
+
+  .sidebar { position: sticky; top: 72px; }
+  .toc-title { font-weight: 600; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 0.8rem; }
+  .toc { list-style: none; padding: 0; border-left: 1px solid var(--border); padding-left: 0.85rem; }
+  .toc li { margin-bottom: 0.45rem; line-height: 1.35; }
+  .toc a { color: var(--muted); font-size: 0.78rem; transition: color 0.15s; display: block; text-decoration: none; cursor: pointer; }
+  .toc a:hover, .toc a.active { color: var(--toc-active); }
+  .toc .toc-h2 { padding-left: 0.75rem; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); cursor: pointer; margin-top: 2.2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); width: 100%; }
+  .back-link:hover { color: var(--text); text-decoration: none; }
+
+  footer { border-top: 1px solid var(--border); padding: 1.5rem; text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 2.5rem; }
+
+  @media (max-width: 900px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
   }
 </style>
 </head>
+
 <body>
+<header>
+  <a class="logo" href="../index.html">Abrar Zahin</a>
+  <nav>
+    <a href="../index.html">Notebook</a>
+    <a href="https://zahinabrar.github.io/">About</a>
+    <a href="https://zahinabrar.github.io/projects/">Projects</a>
+    <a href="https://zahinabrar.github.io/publications/">Publications</a>
+  </nav>
+</header>
 
-<h1>Primer on Diffusion Models</h1>
-<div class="meta">September 2025 · 8 min read · Abrar Zahin</div>
+<div class="breadcrumb">
+  <a href="../index.html">Home</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="../index.html">Notebook</a>
+  <span class="breadcrumb-sep">›</span>
+  <span style="color:var(--text);">Forward Process — Diffusion</span>
+</div>
 
-<p>
-Diffusion models are a class of generative models that learn to reverse a gradual noise corruption process.
-Instead of generating data in a single forward pass, they learn to iteratively denoise a sample.
-</p>
+<div class="page-layout">
+  <main>
+    <article>
+      <div class="article-meta">
+        <span>Feb 2026</span>
+        <span>Primer</span>
+        <span>Abrar Zahin</span>
+        <span>Diffusion Models</span>
+      </div>
 
-<h2>1. Forward Process</h2>
-<p>
-The forward process gradually adds Gaussian noise to data over many timesteps until it becomes nearly pure noise.
-This process is fixed and does not require learning.
-</p>
+      <h1 class="article-title">Forward Process (Diffusion) — Mathematical Formulation</h1>
+      <div class="article-subtitle">How diffusion models systematically add noise: step-by-step and in closed form.</div>
 
-<h2>2. Reverse Process</h2>
-<p>
-A neural network is trained to predict and remove noise at each timestep.
-By reversing the noise process step-by-step, the model generates realistic samples.
-</p>
+      <div class="abstract-box">
+        <div class="abstract-label">Abstract</div>
+        <p>The forward process is the “easy” direction in diffusion: starting from a clean image $x_0$, we add small Gaussian noise over $T$ steps until we reach near-pure noise. This page summarizes the Markov step formulation, the reparameterized sampling form, and the closed-form jump from $x_0$ to $x_t$.</p>
+      </div>
 
-<h2>3. Why It Works</h2>
-<p>
-Diffusion models are stable to train, scale well, and achieve high-quality sample generation.
-Modern image generators like Stable Diffusion are based on this principle.
-</p>
+      <div class="article-body">
 
-<a class="back" href="../index.html">← Back to Notebook</a>
+        <h1 id="overview">Overview</h1>
+        <p>The forward process is where we <strong>systematically add noise</strong> to an image over multiple steps. This is the “easy” direction — going from a clear image to pure noise.</p>
 
+        <h1 id="setup">Setup and Notation</h1>
+        <h2 id="variables">Variables</h2>
+        <ul>
+          <li><strong>$x_0$</strong> = original clean image (our starting point)</li>
+          <li><strong>$x_1, x_2, \dots, x_t, \dots, x_T$</strong> = progressively noisier versions</li>
+          <li><strong>$T$</strong> = total diffusion steps (typically $T=1000$)</li>
+          <li><strong>$t$</strong> = timestep, where $t \in \{0,1,2,\dots,T\}$</li>
+        </ul>
+
+        <h2 id="goal">Goal</h2>
+        <p>By step $T$, we want $x_T$ to be essentially pure Gaussian noise — completely unrecognizable from the original image $x_0$.</p>
+
+        <h1 id="sequential">The Sequential Forward Process</h1>
+
+        <h2 id="single-step">Single Step Formula</h2>
+        <p>At each timestep $t$, we add a small amount of Gaussian noise to the previous image:</p>
+        <p><strong>$$q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t; \sqrt{1-\beta_t}\,x_{t-1}, \beta_t I\right)$$</strong></p>
+
+        <h3 id="notation">Understanding the Notation</h3>
+        <ul>
+          <li><strong>$q(x_t \mid x_{t-1})$</strong>: conditional distribution of $x_t$ given $x_{t-1}$</li>
+          <li><strong>$\mathcal{N}(x;\mu,\sigma^2)$</strong>: Gaussian with mean $\mu$ and variance $\sigma^2$</li>
+        </ul>
+
+        <h3 id="mean">The Mean: $\sqrt{1-\beta_t}\,x_{t-1}$</h3>
+        <ul>
+          <li>Scales the previous image slightly by $\sqrt{1-\beta_t}<1$</li>
+          <li>Makes “room” for noise to be added</li>
+        </ul>
+
+        <div class="note-box">
+          If $\beta_t=0.01$, then $\sqrt{1-\beta_t}=\sqrt{0.99}\approx 0.995$ (we keep ~99.5% of the signal for that step).
+        </div>
+
+        <h3 id="variance">The Variance: $\beta_t I$</h3>
+        <ul>
+          <li>Controls noise amount per step</li>
+          <li>Larger $\beta_t$ = more noise; smaller $\beta_t$ = less noise</li>
+          <li>$I$ means independent noise per pixel (conceptually)</li>
+        </ul>
+
+        <h2 id="simplified">Simplified (Reparameterized) Form</h2>
+        <p>Equivalent sampling form:</p>
+        <p><strong>$$x_t = \sqrt{1-\beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\varepsilon_t,\qquad \varepsilon_t\sim\mathcal{N}(0,I)$$</strong></p>
+
+        <pre><div class="code-header"><span>intuition</span><span class="code-lang">text</span></div><code>new_image = (scale_down × old_image) + (noise_scale × random_noise)</code></pre>
+
+        <h1 id="schedule">The Noise Schedule $\beta_t$</h1>
+
+        <h2 id="what-is-beta">What is $\beta_t$?</h2>
+        <ul>
+          <li>Hyperparameter controlling noise per step</li>
+          <li>Typically $\beta_t\in[0.0001,0.02]$</li>
+          <li>Often increases over time: $\beta_1 < \beta_2 < \dots < \beta_T$</li>
+        </ul>
+
+        <h2 id="common-schedules">Common Schedules</h2>
+        <ul>
+          <li><strong>Linear:</strong> increases linearly from $\beta_1$ to $\beta_T$</li>
+          <li><strong>Cosine:</strong> smoother transitions; often better in practice</li>
+        </ul>
+
+        <h2 id="beta-visual">Visualizing the Effect</h2>
+        <pre><div class="code-header"><span>balanced schedule intuition</span><span class="code-lang">text</span></div><code>t=0:    clear image
+t=250:  mostly signal, slight noise
+t=500:  balanced mix
+t=750:  mostly noise, slight signal
+t=1000: pure noise</code></pre>
+
+        <h1 id="direct">From Sequential to Direct: Closed-Form Jump</h1>
+
+        <h2 id="problem">Problem with Sequential Application</h2>
+        <p>Naively computing $x_t$ requires $t$ sequential steps: $x_0\to x_1\to \dots\to x_t$.</p>
+
+        <h2 id="closed-form">Closed-Form Expression</h2>
+        <p>We can jump directly from $x_0$ to $x_t$:</p>
+        <p><strong>$$q(x_t\mid x_0)=\mathcal{N}\!\left(x_t;\sqrt{\bar\alpha_t}\,x_0,\,(1-\bar\alpha_t)I\right)$$</strong></p>
+        <p>Equivalently:</p>
+        <p><strong>$$x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon,\qquad \varepsilon\sim\mathcal{N}(0,I)$$</strong></p>
+
+        <h2 id="alpha-bar">Understanding $\bar\alpha_t$ (Alpha-bar)</h2>
+        <p>Define:</p>
+        <p><strong>$$\alpha_t = 1-\beta_t,\qquad \bar\alpha_t=\prod_{i=1}^{t}\alpha_i$$</strong></p>
+
+        <div class="note-box">
+          $\bar\alpha_t$ is the fraction of original signal remaining after $t$ steps. It decreases with $t$ and approaches 0 near $T$.
+        </div>
+
+        <pre><div class="code-header"><span>example decay</span><span class="code-lang">text</span></div><code>If βt=0.01 constant:
+α = 0.99
+ᾱ100  = 0.99^100  ≈ 0.366
+ᾱ500  = 0.99^500  ≈ 0.0066
+ᾱ1000 = 0.99^1000 ≈ 0.00004</code></pre>
+
+        <h1 id="interpret">Interpreting the Closed-Form Formula</h1>
+
+        <h2 id="signal-part">Signal Component: $\sqrt{\bar\alpha_t}\,x_0$</h2>
+        <ul>
+          <li>When $t$ is small: $\sqrt{\bar\alpha_t}\approx 1$ (mostly image)</li>
+          <li>When $t$ is large: $\sqrt{\bar\alpha_t}\approx 0$ (signal vanishes)</li>
+        </ul>
+
+        <h2 id="noise-part">Noise Component: $\sqrt{1-\bar\alpha_t}\,\varepsilon$</h2>
+        <ul>
+          <li>When $t$ is small: $\sqrt{1-\bar\alpha_t}\approx 0$ (little noise)</li>
+          <li>When $t$ is large: $\sqrt{1-\bar\alpha_t}\approx 1$ (mostly noise)</li>
+        </ul>
+
+        <h1 id="examples">Concrete Examples</h1>
+
+        <h2 id="ex-early">Example 1: Early timestep ($t=10$)</h2>
+        <p>Assume $\bar\alpha_{10}=0.95$:</p>
+        <pre><div class="code-header"><span>compute</span><span class="code-lang">text</span></div><code>x10 = √0.95 · x0 + √(1-0.95) · ε
+x10 = 0.975 · x0 + 0.224 · ε</code></pre>
+
+        <h2 id="ex-mid">Example 2: Middle timestep ($t=500$)</h2>
+        <p>Assume $\bar\alpha_{500}=0.01$:</p>
+        <pre><div class="code-header"><span>compute</span><span class="code-lang">text</span></div><code>x500 = √0.01 · x0 + √(1-0.01) · ε
+x500 = 0.1 · x0 + 0.995 · ε</code></pre>
+
+        <h2 id="ex-late">Example 3: Late timestep ($t=990$)</h2>
+        <p>Assume $\bar\alpha_{990}=0.0001$:</p>
+        <pre><div class="code-header"><span>compute</span><span class="code-lang">text</span></div><code>x990 = √0.0001 · x0 + √(1-0.0001) · ε
+x990 = 0.01 · x0 + 0.9999 · ε</code></pre>
+
+        <h1 id="special">Special Cases</h1>
+
+        <h2 id="t0">Case 1: No noise ($t=0$)</h2>
+        <p>With $\bar\alpha_0=1$:</p>
+        <p><strong>$$x_0=\sqrt{1}\,x_0+\sqrt{0}\,\varepsilon=x_0$$</strong></p>
+
+        <h2 id="tT">Case 2: Pure noise ($t=T$ large)</h2>
+        <p>With $\bar\alpha_T\approx 0$:</p>
+        <p><strong>$$x_T\approx \varepsilon\sim \mathcal{N}(0,I)$$</strong></p>
+
+        <h1 id="why">Why This Reparameterization Works</h1>
+        <p>Repeated Gaussian noise additions combine into a single Gaussian with accumulated variance. Sketch for two steps:</p>
+        <pre><div class="code-header"><span>intuition</span><span class="code-lang">text</span></div><code>x1 = √(1-β1) x0 + √β1 ε1
+x2 = √(1-β2) x1 + √β2 ε2
+⇒ x2 = √[(1-β1)(1-β2)] x0 + (combined noise terms)
+⇒ x2 = √ᾱ2 x0 + √(1-ᾱ2) ε</code></pre>
+
+        <h1 id="properties">Properties of the Forward Process</h1>
+        <ul>
+          <li><strong>Markov:</strong> $q(x_t\mid x_{t-1},\dots,x_0)=q(x_t\mid x_{t-1})$</li>
+          <li><strong>Fixed:</strong> fully defined by $(x_0,\{\beta_t\},\varepsilon)$; no learning required</li>
+          <li><strong>Gaussian:</strong> $q(x_t\mid x_0)$ is Gaussian for all $t$</li>
+          <li><strong>Converges:</strong> $x_t \to \mathcal{N}(0,I)$ for large $t$</li>
+        </ul>
+
+        <h1 id="timeline">Visual Timeline</h1>
+        <pre><div class="code-header"><span>timeline</span><span class="code-lang">text</span></div><code>t=0     ᾱ=1.00    [████████████████████] Clear photo
+t=250   ᾱ≈0.??    [████████████████░░░░] Slight noise
+t=500   ᾱ≈0.??    [████████░░░░░░░░░░░░] Barely recognizable
+t=750   ᾱ≈0.??    [████░░░░░░░░░░░░░░░░] Almost pure noise
+t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░░] Pure Gaussian noise</code></pre>
+
+        <h1 id="training">Connection to Training</h1>
+        <p>The forward process is not learned. Training uses it to generate pairs $(x_0,x_t,t,\varepsilon)$ efficiently:</p>
+        <ol>
+          <li>Sample a real image $x_0$</li>
+          <li>Sample timestep $t$ and noise $\varepsilon$</li>
+          <li>Compute $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$</li>
+          <li>Train a network to predict $\varepsilon$ given $(x_t,t)$</li>
+        </ol>
+
+        <h1 id="summary">Summary</h1>
+        <ul>
+          <li>Forward diffusion adds Gaussian noise over $T$ steps via $\beta_t$.</li>
+          <li>Single step: $x_t=\sqrt{1-\beta_t}x_{t-1}+\sqrt{\beta_t}\varepsilon_t$.</li>
+          <li>Closed-form: $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$.</li>
+          <li>$\bar\alpha_t=\prod_{i=1}^t (1-\beta_i)$ measures signal remaining.</li>
+        </ul>
+
+        <h1 id="formulas">Key Formulas Reference</h1>
+        <pre><div class="code-header"><span>reference</span><span class="code-lang">text</span></div><code>Sequential:
+q(xt | xt-1) = N(xt; √(1-βt) xt-1, βt I)
+xt = √(1-βt) xt-1 + √βt εt
+
+Direct:
+q(xt | x0) = N(xt; √ᾱt x0, (1-ᾱt) I)
+xt = √ᾱt x0 + √(1-ᾱt) ε
+
+Cumulative:
+αt = 1 - βt
+ᾱt = ∏_{i=1}^t αi</code></pre>
+
+        <a class="back-link" href="../index.html">← Back to Notebook</a>
+      </div>
+    </article>
+  </main>
+
+  <aside class="sidebar">
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc">
+      <li><a onclick="tocScroll('overview')">Overview</a></li>
+      <li><a onclick="tocScroll('setup')">Setup</a></li>
+      <li><a onclick="tocScroll('sequential')">Sequential Process</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('single-step')">Single Step</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('simplified')">Reparameterized</a></li>
+      <li><a onclick="tocScroll('schedule')">Noise Schedule</a></li>
+      <li><a onclick="tocScroll('direct')">Closed-Form Jump</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('alpha-bar')">Alpha-bar</a></li>
+      <li><a onclick="tocScroll('examples')">Examples</a></li>
+      <li><a onclick="tocScroll('properties')">Properties</a></li>
+      <li><a onclick="tocScroll('training')">Training Connection</a></li>
+      <li><a onclick="tocScroll('formulas')">Key Formulas</a></li>
+    </ul>
+  </aside>
+</div>
+
+<footer>
+  © 2026 <a href="https://zahinabrar.github.io/">Abrar Zahin</a>
+</footer>
+
+<script>
+  function tocScroll(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // TOC scroll spy
+  window.addEventListener('scroll', () => {
+    const headings = document.querySelectorAll('.article-body h1[id], .article-body h2[id], .article-body h3[id]');
+    let active = null;
+    headings.forEach(h => { if (h.getBoundingClientRect().top < 95) active = h.id; });
+    document.querySelectorAll('.toc a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('onclick') === `tocScroll('${active}')`);
+    });
+  }, { passive: true });
+</script>
 </body>
 </html>
