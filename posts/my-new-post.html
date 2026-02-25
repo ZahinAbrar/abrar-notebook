@@ -137,7 +137,7 @@
 
       <div class="abstract-box">
         <div class="abstract-label">Abstract</div>
-        <p>This comprehensive guide covers both the forward diffusion process (systematically adding noise) and the reverse denoising process (learning to remove noise with neural networks). Starting from a clean image $x_0$, we add Gaussian noise over $T$ steps until reaching pure noise, then learn to reverse this process to generate new realistic images from random noise.</p>
+        <p>This note covers both the forward diffusion process (systematically adding noise) and the reverse denoising process (learning to remove noise with neural networks). Starting from a clean image $x_0$, we add Gaussian noise over $T$ steps until reaching pure noise, then learn to reverse this process to generate new realistic images from random noise.</p>
       </div>
 
       <div class="article-body">
@@ -310,7 +310,7 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░
         <p>The forward process is not learned. Training uses it to generate pairs $(x_0,x_t,t,\varepsilon)$ efficiently:</p>
         <ol>
           <li>Sample a real image $x_0$</li>
-          <li>Sample timestep $t$ and noise $\varepsilon$</li>
+          <li>Choose a timestep $t$ and noise $\varepsilon$</li>
           <li>Compute $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$</li>
           <li>Train a network to predict $\varepsilon$ given $(x_t,t)$</li>
         </ol>
@@ -320,7 +320,7 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░
           <li>Forward diffusion adds Gaussian noise over $T$ steps via $\beta_t$.</li>
           <li>Single step: $x_t=\sqrt{1-\beta_t}x_{t-1}+\sqrt{\beta_t}\varepsilon_t$.</li>
           <li>Closed-form: $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$.</li>
-          <li>$\bar\alpha_t=\prod_{i=1}^t (1-\beta_i)$ measures signal remaining.</li>
+          <li>$\bar\alpha_t=\prod_{i=1}^t (1-\beta_i)$ measures the remaining signal.</li>
         </ul>
 
         <!-- PART 2: REVERSE PROCESS -->
@@ -329,15 +329,15 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░
         </div>
 
         <h1 id="overview-reverse">Overview</h1>
-        <p>The reverse process is the <strong>"hard" direction</strong> in diffusion models — learning to remove noise and generate realistic images. This is where the neural network comes in.</p>
+        <p>The reverse process is the <strong>"hard" direction</strong> in diffusion models — learning to remove noise and generate realistic images. This is where the neural network comes into picture.</p>
 
         <h2 id="goal-reverse">The Goal</h2>
         <p>We want to reverse the forward process:</p>
-        <pre><div class="code-header"><span>process direction</span><span class="code-lang">text</span></div><code>Forward:  x₀ → x₁ → x₂ → ... → xₜ  (add noise, easy)
-Reverse:  xₜ → xₜ₋₁ → xₜ₋₂ → ... → x₀  (remove noise, hard!)</code></pre>
+        <pre><div class="code-header"><span>process direction</span><span class="code-lang">text</span></div><code>Forward:  x₀ → x₁ → x₂ → ... → xₜ  (add noise)
+Reverse:  xₜ → xₜ₋₁ → xₜ₋₂ → ... → x₀  (remove noise)</code></pre>
 
         <h2 id="why-hard">Why is Reverse Hard?</h2>
-        <p>Given a noisy image $x_t$, there are <strong>infinite possible</strong> images $x_0$ that could have produced it after adding noise. The reverse process needs to figure out which one is most likely to be realistic.</p>
+        <p>Given a noisy image $x_t$, there are <strong>infinite possible</strong> images $x_0$ that could have produced it after adding noise. The reverse process needs to figure out which one is <strong>most likely to be realistic.</strong></p>
 
         <h1 id="formulation">The Reverse Process Formula</h1>
 
