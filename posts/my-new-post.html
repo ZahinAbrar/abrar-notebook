@@ -373,7 +373,7 @@ Reverse:  xₜ → xₜ₋₁ → xₜ₋₂ → ... → x₀  (remove noise)</c
         </ul>
 
         <h2 id="why-predict">Why Predict Noise?</h2>
-        <p>Both predicting noise and predicting the clean image work, but predicting noise is more stable in practice. Once we know the noise, we can compute the clean image:</p>
+        <p>Both predicting noise and predicting the clean image work, but notice that it is mathematically simpler and more effective to estimate a Gaussian noise distribution than to directly generate a high-dimensional, complex image from random pixels. Once we know the noise, we can compute the clean image:</p>
 
         <p><strong>$$\hat{x}_0 = \frac{x_t - \sqrt{1-\bar\alpha_t} \cdot \varepsilon_\theta(x_t, t)}{\sqrt{\bar\alpha_t}}$$</strong></p>
 
@@ -409,7 +409,7 @@ Reverse:  xₜ → xₜ₋₁ → xₜ₋₂ → ... → x₀  (remove noise)</c
         <p>Where $z \sim \mathcal{N}(0, I)$ is fresh random noise.</p>
 
         <div class="note-box">
-          Don't worry about memorizing this formula — the key insight is: <strong>predict noise → subtract it → get less noisy image</strong>.
+          The key insight is: <strong>predict noise → subtract it → get less noisy image</strong>.
         </div>
 
         <h1 id="training">Training the Diffusion Model</h1>
