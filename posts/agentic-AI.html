@@ -3,17 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Exploring Agentic AI | Abrar Zahin</title>
+<title>Paper Reviewer Agent — Deep Dive Analysis | Abrar Zahin</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});">
 </script>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
-  onload="hljs.highlightAll();"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -55,31 +51,7 @@
 
   .note-box { background: #eff6ff; border-left: 3px solid #3b82f6; padding: 0.75rem 1rem; font-size: 0.85rem; color: #1e40af; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
   .warning-box { background: #fefce8; border-left: 3px solid #fbbf24; padding: 0.75rem 1rem; font-size: 0.85rem; color: #92400e; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
-
-  /* Level nav cards */
-  .levels-nav { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 2rem 0; }
-  .level-card {
-    flex: 1; min-width: 140px; border: 1.5px solid var(--border); border-radius: 8px;
-    padding: 0.85rem 1rem; cursor: pointer; transition: all 0.18s; background: #fafafa;
-    text-align: center;
-  }
-  .level-card:hover { border-color: var(--accent); background: #eff6ff; }
-  .level-card.active { border-color: var(--accent); background: #eff6ff; box-shadow: 0 0 0 2px rgba(0,112,243,0.12); }
-  .level-card.wip { opacity: 0.55; cursor: default; }
-  .level-card.wip:hover { border-color: var(--border); background: #fafafa; }
-  .level-num { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.25rem; }
-  .level-card.active .level-num { color: var(--accent); }
-  .level-name { font-size: 0.82rem; font-weight: 600; color: var(--text); line-height: 1.3; }
-  .level-card.wip .level-name { color: var(--muted); }
-  .wip-badge { display: inline-block; margin-top: 0.35rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; background: #fef3c7; padding: 1px 6px; border-radius: 3px; }
-  .done-badge { display: inline-block; margin-top: 0.35rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #065f46; background: #d1fae5; padding: 1px 6px; border-radius: 3px; }
-
-  /* Level panels */
-  .level-panel { display: none; }
-  .level-panel.active { display: block; }
-
-  .part-divider { border-top: 3px solid var(--border); margin: 2.5rem 0 1.5rem; padding-top: 0.5rem; }
-  .part-title { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
+  .success-box { background: #f0fdf4; border-left: 3px solid #22c55e; padding: 0.75rem 1rem; font-size: 0.85rem; color: #15803d; margin: 1.2rem 0; border-radius: 0 4px 4px 0; line-height: 1.6; }
 
   .article-body h1 { font-family: 'Lora', serif; font-size: 1.42rem; font-weight: 600; margin: 2.2rem 0 0.85rem; scroll-margin-top: 78px; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
   .article-body h2 { font-family: 'Lora', serif; font-size: 1.12rem; font-weight: 600; margin: 1.7rem 0 0.55rem; scroll-margin-top: 78px; }
@@ -102,33 +74,41 @@
   .article-body table td { padding: 0.75rem; border: 1px solid var(--border); font-size: 0.875rem; }
   .article-body table tr:nth-child(even) { background: #f9fafb; }
 
-  /* Colab button */
-  .colab-btn {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: #f9ab00; color: #000; font-weight: 600; font-size: 0.83rem;
-    padding: 0.5rem 1rem; border-radius: 5px; margin: 1rem 0 1.5rem;
-    transition: background 0.15s; text-decoration: none;
-  }
-  .colab-btn:hover { background: #e09b00; text-decoration: none; color: #000; }
-  .colab-btn svg { flex-shrink: 0; }
+  .part-divider { border-top: 3px solid var(--border); margin: 3rem 0; padding-top: 0.5rem; }
+  .part-title { font-family: 'Lora', serif; font-size: 1.6rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
+
+  /* Level badge */
+  .level-badge { display: inline-flex; align-items: center; gap: 0.45rem; background: #0070f3; color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.22rem 0.75rem; border-radius: 20px; margin-bottom: 0.75rem; }
+  .level-badge.l2 { background: #8b5cf6; }
+  .level-badge.l3 { background: #059669; }
+  .level-badge.l4 { background: #f59e0b; color: #1a1a1a; }
+  .level-badge.l5 { background: #ef4444; }
 
   /* Architecture diagram */
-  .arch-diagram { border: 1px solid var(--border); border-radius: 8px; background: #fafafa; padding: 1.5rem; margin: 1.5rem 0; }
-  .arch-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.6rem; }
-  .arch-box { border: 1.5px solid #93c5fd; background: #eff6ff; border-radius: 5px; padding: 0.4rem 0.85rem; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; font-weight: 500; color: #1e40af; white-space: nowrap; }
-  .arch-box.green { border-color: #6ee7b7; background: #ecfdf5; color: #065f46; }
-  .arch-box.amber { border-color: #fcd34d; background: #fef9c3; color: #92400e; }
-  .arch-box.purple { border-color: #c4b5fd; background: #f5f3ff; color: #5b21b6; }
-  .arch-box.agent { border-color: #0070f3; background: #0070f3; color: #fff; font-weight: 700; }
-  .arch-arrow { font-size: 1.1rem; color: var(--muted); }
-  .arch-caption { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; font-style: italic; text-align: center; }
+  .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .arch-card { border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; background: #fafafa; }
+  .arch-card-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-bottom: 0.4rem; }
+  .arch-card p { font-size: 0.82rem; color: #374151; margin: 0; line-height: 1.55; }
 
-  /* WIP panel */
-  .wip-panel { border: 2px dashed var(--border); border-radius: 8px; padding: 2.5rem; text-align: center; margin: 2rem 0; background: #fafafa; }
-  .wip-panel .wip-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
-  .wip-panel h3 { font-family: 'Lora', serif; font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--text); }
-  .wip-panel p { font-size: 0.9rem; color: var(--muted); max-width: 420px; margin: 0 auto; }
+  /* Pipeline flow */
+  .pipeline { display: flex; align-items: center; gap: 0; margin: 1.5rem 0; flex-wrap: wrap; }
+  .pipeline-step { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 6px; padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 600; color: #1e40af; white-space: nowrap; }
+  .pipeline-arrow { color: #93c5fd; font-size: 1.2rem; padding: 0 0.3rem; }
 
+  /* Output block */
+  .output-block { background: #0f172a; border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0; overflow-x: auto; }
+  .output-block pre { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #e2e8f0; line-height: 1.65; background: transparent !important; border: none !important; padding: 0 !important; }
+  .output-block pre code { background: transparent !important; border: none !important; padding: 0 !important; color: #e2e8f0 !important; }
+  .output-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.4rem; font-family: 'JetBrains Mono', monospace; }
+
+  /* Diagram styles */
+  .diagram-wrap { margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: #fafafa; padding: 1.4rem 1rem 1rem; text-align: center; }
+  .diagram-caption { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; font-style: italic; text-align: center; }
+  .legend { display: flex; gap: 1.1rem; flex-wrap: wrap; justify-content: center; margin-top: 0.85rem; font-size: 0.78rem; color: #374151; }
+  .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+  .legend-dot { width: 13px; height: 13px; border-radius: 2px; flex-shrink: 0; }
+
+  /* References */
   .references { border-top: 1px solid var(--border); margin-top: 2.5rem; padding-top: 1.5rem; }
   .ref-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.75rem; }
   .references ol { padding-left: 1.4rem; }
@@ -143,9 +123,6 @@
   .toc .toc-h2 { padding-left: 0.75rem; }
   .toc-part { font-weight: 600; color: var(--accent); margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.72rem; }
 
-  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); cursor: pointer; margin-top: 2.2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); width: 100%; }
-  .back-link:hover { color: var(--text); text-decoration: none; }
-
   footer { border-top: 1px solid var(--border); padding: 1.5rem; text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 2.5rem; }
 
   @media (max-width: 900px) {
@@ -157,9 +134,9 @@
 
 <body>
 <header>
-  <a class="logo" href="../index.html">Abrar Zahin</a>
+  <span class="logo">Abrar Zahin</span>
   <nav>
-    <a href="../index.html">Notebook</a>
+    <a href="#">Notebook</a>
     <a href="https://zahinabrar.github.io/">About</a>
     <a href="https://zahinabrar.github.io/projects/">Projects</a>
     <a href="https://zahinabrar.github.io/publications/">Publications</a>
@@ -167,11 +144,11 @@
 </header>
 
 <div class="breadcrumb">
-  <a href="../index.html">Home</a>
+  <a href="#">Home</a>
   <span class="breadcrumb-sep">›</span>
-  <a href="../index.html">Notebook</a>
+  <a href="#">Notebook</a>
   <span class="breadcrumb-sep">›</span>
-  <span style="color:var(--text);">Exploring Agentic AI</span>
+  <span style="color:var(--text);">Paper Reviewer Agent</span>
 </div>
 
 <div class="page-layout">
@@ -179,308 +156,712 @@
     <article>
       <div class="article-meta">
         <span>Feb 2026</span>
-        <span>Series</span>
+        <span>Deep Dive</span>
         <span>Abrar Zahin</span>
-        <span>Agents · LLMs · Systems</span>
+        <span>Agentic AI · LLM Systems · Agno</span>
       </div>
 
-      <h1 class="article-title">Exploring Agentic AI</h1>
-      <div class="article-subtitle">Building a paper-reviewing agent from a simple tool-caller to a production multi-agent system — one level at a time.</div>
+      <h1 class="article-title">Building a Paper Reviewer Agent — From Stateless Tool Use to a Deployed Multi-Agent Service</h1>
+      <div class="article-subtitle">A progressive five-level walkthrough of constructing an agentic AI system that reads research papers and produces structured reviews, evolving from a simple tool-calling agent to a production FastAPI service with persistent memory, a searchable knowledge base, learned behavioral preferences, and a multi-agent review committee.</div>
 
       <div class="abstract-box">
-        <div class="abstract-label">About this series</div>
-        <p>I wanted a concrete, end-to-end project to understand how agentic AI systems actually get built — not just the theory, but the real decisions around tool design, memory, multi-agent orchestration, and productionization. So I built one: a paper-reviewing agent that I gradually extended across five levels of increasing capability. Each level adds exactly one layer of complexity — no more — so you can see what each piece actually buys you. The project is built in Python (Google Colab), using the <a href="https://docs.agno.com" target="_blank">Agno</a> framework and OpenAI models. Click a level below to explore.</p>
-      </div>
-
-      <!-- LEVEL NAV CARDS -->
-      <div class="levels-nav" id="levelsNav">
-        <div class="level-card active" onclick="showLevel(1)" id="card-1">
-          <div class="level-num">Level 1</div>
-          <div class="level-name">Agent with Tools</div>
-          <span class="done-badge">✓ Complete</span>
-        </div>
-        <div class="level-card wip" id="card-2">
-          <div class="level-num">Level 2</div>
-          <div class="level-name">Storage + Knowledge</div>
-          <span class="wip-badge">In Progress</span>
-        </div>
-        <div class="level-card wip" id="card-3">
-          <div class="level-num">Level 3</div>
-          <div class="level-name">Memory + Learning</div>
-          <span class="wip-badge">Coming Soon</span>
-        </div>
-        <div class="level-card wip" id="card-4">
-          <div class="level-num">Level 4</div>
-          <div class="level-name">Multi-Agent Team</div>
-          <span class="wip-badge">Coming Soon</span>
-        </div>
-        <div class="level-card wip" id="card-5">
-          <div class="level-num">Level 5</div>
-          <div class="level-name">Production System</div>
-          <span class="wip-badge">Coming Soon</span>
-        </div>
+        <div class="abstract-label">Abstract</div>
+        <p>This notebook implements a complete pipeline for automated academic paper reviewing using the <strong>Agno</strong> agent framework and <strong>OpenAI GPT-4o-mini</strong>. The paper under review is <em>Denoising Diffusion Probabilistic Models</em> (Ho et al., NeurIPS 2020). The system is progressively upgraded across five architectural levels: a stateless tool-augmented agent (Level 1), a persistent agent with a searchable rubric knowledge base (Level 2), a learning agent that retains behavioral preferences across sessions (Level 3), a multi-agent review committee with role specialization (Level 4), and a production-ready FastAPI service (Level 5). Each level introduces a concrete architectural capability and documents the observed agent behavior through live output traces.</p>
       </div>
 
       <div class="article-body">
 
-        <!-- ============================= LEVEL 1 ============================= -->
-        <div class="level-panel active" id="panel-1">
+        <!-- ===================== PART 1 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 1: System Architecture Overview</div>
+        </div>
 
-          <div class="part-divider">
-            <div class="part-title">Level 1 — Agent with Tools</div>
+        <h1 id="overview">The Five-Level Architecture</h1>
+        <p>The notebook is organized as a progressive capability ladder. Each level is a superset of the previous — adding one new architectural concern without discarding earlier infrastructure. By the final level, the system has five distinct layers operating together.</p>
+
+        <div class="arch-grid">
+          <div class="arch-card">
+            <div class="arch-card-title" style="color:#0070f3;">Level 1</div>
+            <p>Stateless tool-augmented agent. Reads <code>paper.txt</code>, writes <code>review.md</code> using <code>CodingTools</code>. No memory, no persistence.</p>
           </div>
-
-          <a class="colab-btn" href="https://colab.research.google.com/drive/1" target="_blank">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#F9AB00"/><path d="M8 8l8 4-8 4V8z" fill="white"/></svg>
-            Open Notebook in Google Colab
-          </a>
-
-          <h1 id="l1-intro">What I'm building here</h1>
-          <p>The simplest useful agent isn't a chatbot — it's something that actually <em>does</em> things: reads files, writes outputs, calls utilities. Level 1 is about that baseline. I give a language model a set of tools and a task — "read this paper, write a structured review" — and watch it plan and execute steps without me holding its hand.</p>
-
-          <p>The paper I used as a test case is <em>Denoising Diffusion Probabilistic Models</em> (Ho et al., 2020). But the agent is general: swap in any PDF and it handles it the same way.</p>
-
-          <h1 id="l1-arch">Architecture</h1>
-
-          <div class="arch-diagram">
-            <div class="arch-row">
-              <div class="arch-box">paper.pdf</div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-box green">PDF → text extractor<br><small>(pypdf)</small></div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-box">paper.txt</div>
-            </div>
-            <div class="arch-row">
-              <div class="arch-box">paper.txt</div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-box agent">PaperReviewer Agent<br><small>gpt-4o-mini + CodingTools</small></div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-box amber">review.md</div>
-            </div>
-            <div class="arch-caption">The full pipeline. No memory, no retrieval — just tools, a model, and a task.</div>
+          <div class="arch-card">
+            <div class="arch-card-title" style="color:#8b5cf6;">Level 2</div>
+            <p>SQLite session storage + ChromaDB knowledge base. Rubric embedded and retrieved. Multi-turn continuity enabled.</p>
           </div>
+          <div class="arch-card">
+            <div class="arch-card-title" style="color:#059669;">Level 3</div>
+            <p>Learned memory via <code>LearningMachine</code>. Agent autonomously stores behavioral preferences (e.g., <em>Weaknesses must start with "Critical:"</em>) across sessions.</p>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card-title" style="color:#d97706;">Level 4</div>
+            <p>Multi-agent <code>Team</code> with Summarizer, Critic, and MetaReviewer roles. Decomposed reasoning pipeline mirroring a real review committee.</p>
+          </div>
+          <div class="arch-card">
+            <div class="arch-card-title" style="color:#ef4444;">Level 5</div>
+            <p>FastAPI <code>POST /review</code> endpoint. Wraps the Level 3 agent as a deployable HTTP service with JSON I/O and deterministic rubric injection.</p>
+          </div>
+        </div>
 
-          <p>There are exactly three components:</p>
-          <ul>
-            <li><strong>PDF extractor</strong> — pulls raw text out of the PDF page by page using <code>pypdf</code>, writes it to <code>paper.txt</code> in the Colab workspace.</li>
-            <li><strong>Agent</strong> — an <code>agno.Agent</code> with <code>CodingTools</code> attached. CodingTools gives it the ability to read files, write files, and run small Python snippets in the workspace.</li>
-            <li><strong>Workspace</strong> — a local directory (<code>/content/workspace</code>) that serves as shared state between the extractor and the agent.</li>
-          </ul>
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 680 90" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;display:block;margin:0 auto;">
+            <!-- Layer boxes -->
+            <rect x="5"   y="20" width="116" height="50" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+            <text x="63"  y="41" font-size="9" font-weight="700" fill="#1e40af" font-family="Inter,sans-serif" text-anchor="middle">TOOL LAYER</text>
+            <text x="63"  y="57" font-size="8" fill="#3b82f6" font-family="Inter,sans-serif" text-anchor="middle">CodingTools</text>
+            <text x="63"  y="67" font-size="8" fill="#3b82f6" font-family="Inter,sans-serif" text-anchor="middle">read / write / shell</text>
 
-          <h1 id="l1-tools">The tools</h1>
-          <p>The key design choice at this level is what tools to give the agent. I didn't build custom tools — I used <code>CodingTools</code> from Agno, which wraps read/write/exec operations into a standard tool interface the model can call. The agent sees these as: <code>read_file(path)</code>, <code>write_file(path, content)</code>, <code>run_python(code)</code>, and <code>list_files(path)</code>.</p>
+            <text x="133" y="46" font-size="14" fill="#93c5fd" font-family="Inter,sans-serif">→</text>
 
-          <p>That's all it needs. The model decides on its own when to read, when to write, and what to put in the review. I don't script the steps — I describe them in the system prompt and let the model figure out the ordering.</p>
+            <rect x="145" y="20" width="116" height="50" rx="6" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+            <text x="203" y="41" font-size="9" font-weight="700" fill="#6d28d9" font-family="Inter,sans-serif" text-anchor="middle">STORAGE LAYER</text>
+            <text x="203" y="57" font-size="8" fill="#7c3aed" font-family="Inter,sans-serif" text-anchor="middle">SQLite session DB</text>
+            <text x="203" y="67" font-size="8" fill="#7c3aed" font-family="Inter,sans-serif" text-anchor="middle">history &amp; audit trail</text>
 
-          <h2 id="l1-setup">Environment setup</h2>
+            <text x="273" y="46" font-size="14" fill="#c4b5fd" font-family="Inter,sans-serif">→</text>
 
-          <pre><div class="code-header"><span>install dependencies</span><span class="code-lang">python</span></div><code>!pip -q install agno pypdf</code></pre>
+            <rect x="285" y="20" width="116" height="50" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+            <text x="343" y="41" font-size="9" font-weight="700" fill="#166534" font-family="Inter,sans-serif" text-anchor="middle">KNOWLEDGE LAYER</text>
+            <text x="343" y="57" font-size="8" fill="#16a34a" font-family="Inter,sans-serif" text-anchor="middle">ChromaDB (static)</text>
+            <text x="343" y="67" font-size="8" fill="#16a34a" font-family="Inter,sans-serif" text-anchor="middle">hybrid search rubric</text>
 
-          <pre><div class="code-header"><span>set openai key</span><span class="code-lang">python</span></div><code>import os, getpass
-os.environ["OPENAI_API_KEY"] = getpass.getpass("Paste OPENAI_API_KEY: ")</code></pre>
+            <text x="413" y="46" font-size="14" fill="#86efac" font-family="Inter,sans-serif">→</text>
 
-          <h2 id="l1-extract">Step 1 — extract text from PDF</h2>
+            <rect x="425" y="20" width="116" height="50" rx="6" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+            <text x="483" y="41" font-size="9" font-weight="700" fill="#92400e" font-family="Inter,sans-serif" text-anchor="middle">MEMORY LAYER</text>
+            <text x="483" y="57" font-size="8" fill="#b45309" font-family="Inter,sans-serif" text-anchor="middle">ChromaDB (learned)</text>
+            <text x="483" y="67" font-size="8" fill="#b45309" font-family="Inter,sans-serif" text-anchor="middle">behavioral prefs</text>
 
-          <pre><div class="code-header"><span>pdf → paper.txt</span><span class="code-lang">python</span></div><code>from pathlib import Path
-from pypdf import PdfReader
+            <text x="553" y="46" font-size="14" fill="#fde68a" font-family="Inter,sans-serif">→</text>
 
-WORKSPACE = Path("/content/workspace")
-WORKSPACE.mkdir(exist_ok=True)
+            <rect x="565" y="20" width="110" height="50" rx="6" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+            <text x="620" y="41" font-size="9" font-weight="700" fill="#991b1b" font-family="Inter,sans-serif" text-anchor="middle">SERVICE LAYER</text>
+            <text x="620" y="57" font-size="8" fill="#dc2626" font-family="Inter,sans-serif" text-anchor="middle">FastAPI / HTTP</text>
+            <text x="620" y="67" font-size="8" fill="#dc2626" font-family="Inter,sans-serif" text-anchor="middle">POST /review</text>
+          </svg>
+          <div class="diagram-caption">All five layers are cumulative — each level adds a new architectural capability while preserving the layers beneath it.</div>
+        </div>
 
-pdf_path = WORKSPACE / "paper.pdf"    # upload your PDF here first
-reader   = PdfReader(str(pdf_path))
+        <h2 id="paper-target">The Target Paper</h2>
+        <p>The paper under review is <strong>Denoising Diffusion Probabilistic Models</strong> (Ho, Jain &amp; Abbeel, UC Berkeley, NeurIPS 2020). The PDF (10.3 MB) is loaded into a Google Colab workspace, converted to plain text using <code>pypdf</code>, and stored as <code>paper.txt</code> (56,805 characters across all pages). The agent always reads from this text file, never directly from the PDF.</p>
 
-chunks = []
-for i, page in enumerate(reader.pages):
-    t = page.extract_text() or ""
-    chunks.append(f"\n\n===== PAGE {i+1} =====\n{t}")
+        <pre><div class="code-header"><span>workspace contents after setup</span><span class="code-lang">shell</span></div><code>total 10100
+-rw-r--r--  Denoising-Diffusion-Probabilistic-Models.pdf   10267274 bytes
+-rw-r--r--  paper.txt                                         58106 bytes
+-rw-r--r--  review.md                                          2149 bytes
+-rw-r--r--  agents.db                                        (SQLite session store)</code></pre>
 
-paper_txt = "\n".join(chunks)
-(WORKSPACE / "paper.txt").write_text(paper_txt, encoding="utf-8")
-print("Extracted chars:", len(paper_txt))</code></pre>
+        <!-- ===================== PART 2 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 2: Level 1 — Stateless Tool-Augmented Agent</div>
+        </div>
 
-          <p>I delimit each page with a header (<code>===== PAGE N =====</code>) so the agent — and I, when debugging — can tell which part of the paper a given paragraph comes from. When the model reads this file, those headers become natural anchors for things like "find the evaluation section."</p>
+        <h1 id="level1">Level 1: The Minimal Viable Reviewer</h1>
+        <div class="level-badge">Level 1</div>
 
-          <h2 id="l1-agent">Step 2 — define the agent</h2>
+        <p>Level 1 establishes the baseline: a single agent that uses file-system tools to read input and write output. The model is <code>gpt-4o-mini</code> wrapped in <code>OpenAIResponses</code>, and the only capability beyond text generation is <code>CodingTools</code> — a file and shell access toolkit scoped to the workspace directory.</p>
 
-          <pre><div class="code-header"><span>agent definition</span><span class="code-lang">python</span></div><code>from agno.agent import Agent
-from agno.models.openai import OpenAIResponses
-from agno.tools.coding import CodingTools
-
-agent = Agent(
+        <pre><div class="code-header"><span>Level 1 agent instantiation</span><span class="code-lang">python</span></div><code>agent = Agent(
     name="PaperReviewer",
     model=OpenAIResponses(id="gpt-4o-mini"),
-    tools=[CodingTools(workspace_dir=str(WORKSPACE))],
     instructions=(
         "You are a paper reviewing agent.\n"
         "You MUST use tools.\n"
         "Step 1: Open and read paper.txt from the workspace.\n"
-        "Step 2: Write a structured review to review.md in the workspace.\n"
+        "Step 2: Write the structured review to review.md in the workspace.\n"
         "Step 3: Verify by listing files.\n\n"
-        "Review format:\n"
-        "# Paper Review\n"
-        "## Summary (3-4 sentences)\n"
-        "## Contributions (bullet list)\n"
-        "## Strengths (bullet list)\n"
-        "## Weaknesses (bullet list)\n"
-        "## Questions for Authors (bullet list)\n"
-        "## Score: X/10\n\n"
-        "Be critical but fair. Focus on empirical evaluation."
+        "REVIEW FORMAT:\n"
+        "1) Summary (3-5 bullets)\n"
+        "2) Contributions (max 3 bullets)\n"
+        "3) Strengths (max 4 bullets)\n"
+        "4) Weaknesses (max 4 bullets)\n"
+        "5) Questions for authors (max 5 bullets)\n"
+        "6) Reproducibility checklist (bullets)\n"
+        "7) Score (1-10) + 1-line justification\n\n"
+        "You are not allowed to ask for the PDF. Use paper.txt."
     ),
+    tools=[CodingTools(base_dir=WORKSPACE, all=True)],
+    markdown=True,
 )</code></pre>
 
-          <p>A few choices worth explaining. I used <code>gpt-4o-mini</code> rather than a larger model — it's cheap enough to iterate on, and for a well-structured task like "read this file and write in this format" it performs just as well. The instructions are tightly scoped: I enumerate the steps explicitly and specify the exact markdown sections I want in the output. This isn't prompt engineering for its own sake; it's defining the contract between me and the agent so I can reliably parse the review downstream.</p>
+        <h2 id="level1-execution">Execution Trace</h2>
+        <p>When prompted to read <code>paper.txt</code> and produce <code>review.md</code>, the agent issues a sequence of shell commands before generating any text. This is the core of agentic behavior: act before reasoning, not after.</p>
 
-          <h2 id="l1-run">Step 3 — run it</h2>
+        <div class="output-label">agent tool calls (logged)</div>
+        <div class="output-block"><pre>INFO  Running shell command: file paper.txt
+INFO  Running shell command: ls -l paper.txt
+INFO  Running shell command: head -n 40 paper.txt
+INFO  Wrote review.md</pre></div>
 
-          <pre><div class="code-header"><span>invoke the agent</span><span class="code-lang">python</span></div><code>agent.print_response(
-    "Read paper.txt and write review.md. "
-    "Then list files and show the first 40 lines of review.md.",
+        <div class="note-box">The agent first calls <code>file paper.txt</code> and <code>ls -l paper.txt</code> to verify the file exists and check its type, before reading content. This inspect-before-act behavior emerges from the system prompt instruction "Never assume file type." It is a good agentic pattern and demonstrates that prompt engineering shapes not just output content but tool-calling strategy.</div>
+
+        <h2 id="level1-output">Level 1 Review Output</h2>
+        <p>The resulting <code>review.md</code> (2,149 bytes) is well-structured and correctly follows the seven-section rubric specified in the system prompt:</p>
+
+        <div class="output-block"><pre># Review of "Denoising Diffusion Probabilistic Models"
+
+## Summary
+- Presents a method for high-quality image synthesis using diffusion probabilistic models.
+- Highlights a novel connection between diffusion models and denoising score matching.
+- Experiments show state-of-the-art performance on CIFAR10 and LSUN datasets.
+- Implementation available on GitHub, allowing for reproducibility.
+
+## Contributions
+- Introduction of a weighted variational bound for training diffusion models.
+- Development of a progressive lossy decompression scheme linked to autoregressive decoding.
+- Demonstration of significant improvements in image quality metrics.
+
+## Strengths
+- Strong theoretical foundation connecting diffusion models and score matching.
+- Impressive empirical results on well-known benchmarks.
+- Openness of implementation promotes reproducibility and further exploration.
+- Addresses a critical area in generative modeling with promising results.
+
+## Weaknesses
+- Lack of detailed analysis on the computational efficiency of the proposed method.
+- Limited comparison with other state-of-the-art methods beyond metrics.
+- Potential overfitting on the CIFAR10 dataset without robust validation on other datasets.
+- Assumptions regarding the data distribution may not generalize across different domains.
+
+## Questions for authors
+- How does the performance scale with larger datasets beyond CIFAR10?
+- Can you provide details on the computational overhead introduced by the weighted variational bound?
+- What are the limitations of the progressive decompression scheme in practical applications?
+- Are there any plans for further optimization of the model?
+- How do you envision the application of these models in real-world scenarios?
+
+## Reproducibility checklist
+- Implementation available on GitHub.
+- Detailed descriptions of datasets and metrics used.
+- Open source code facilitates experiments and modifications by other researchers.
+- Clear instructions for replication of results.
+
+## Score
+8 - The paper provides significant contributions to generative modeling but lacks some depth in analysis.</pre></div>
+
+        <h2 id="level1-analysis">Level 1 Analysis</h2>
+        <p>The Level 1 agent succeeds at the basic task but has significant limitations. The review is structurally sound but somewhat generic — it stays at surface-level critique ("lack of detailed analysis", "limited comparison") without engaging with the paper's specific technical claims about log likelihoods, the ELBO decomposition, or the $T$-step Markov chain formulation. The score of 8/10 is reasonable but unsupported by quantitative evidence from the paper.</p>
+
+        <table>
+          <tr><th>Dimension</th><th>Observation</th></tr>
+          <tr><td>Structure adherence</td><td>✅ All 7 sections present with correct bullet limits</td></tr>
+          <tr><td>Technical depth</td><td>⚠️ Surface-level — misses key technical weaknesses</td></tr>
+          <tr><td>Session continuity</td><td>❌ Stateless — context lost after each run</td></tr>
+          <tr><td>Rubric enforcement</td><td>⚠️ Soft — relies on model compliance, not structural enforcement</td></tr>
+          <tr><td>File operation reliability</td><td>✅ Tool-calling pipeline works correctly end-to-end</td></tr>
+        </table>
+
+        <!-- ===================== PART 3 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 3: Level 2 — Persistence + Knowledge Base</div>
+        </div>
+
+        <h1 id="level2">Level 2: Persistent Session Storage and Searchable Rubric</h1>
+        <div class="level-badge l2">Level 2</div>
+
+        <p>Level 2 adds two infrastructure components: a <strong>SQLite session store</strong> for conversational continuity and a <strong>ChromaDB vector store</strong> for embedding and retrieving a structured review rubric. The core insight is separating <em>what the agent remembers about past interactions</em> (SQLite) from <em>what the agent knows about how to behave</em> (ChromaDB).</p>
+
+        <h2 id="level2-storage">SQLite Session Storage</h2>
+        <p>The <code>SqliteDb</code> component stores per-session conversation history in <code>agents.db</code>. This allows the agent to reference its prior outputs in a multi-turn workflow — for example, "rewrite the weaknesses section to be sharper" works correctly in a follow-up message because the agent still has context from the previous turn. Without this, every prompt is treated as a cold start.</p>
+
+        <h2 id="level2-knowledge">ChromaDB Hybrid Search Knowledge Base</h2>
+        <p>The rubric is seeded into a Chroma vector collection using <code>text-embedding-3-small</code> embeddings and <code>SearchType.hybrid</code> — combining semantic similarity with keyword matching. The rubric document specifies both style (concise, bullet-heavy, no fluff) and evaluation priorities (benchmarking first, baseline comparisons, dataset suitability, ablation coverage, threats to validity).</p>
+
+        <pre><div class="code-header"><span>rubric seeded into knowledge base</span><span class="code-lang">python</span></div><code>knowledge.insert(text_content="""
+# Paper Review Rubric (Abrar)
+
+## Style
+- Be concise and bullet-heavy.
+- No fluff or motivational text.
+- Max 3–5 bullets per section.
+
+## What to prioritize
+- Benchmarking and evaluation details first.
+- Compare against the right baselines.
+- Check dataset suitability and splits.
+- Look for missing ablations / missing comparisons.
+- Identify threats to validity (data leakage, cherry-picking, metric misuse).
+
+## Review format (must follow)
+1) Summary (3–5 bullets)
+2) Contributions (max 3 bullets)
+3) Strengths (max 4 bullets)
+4) Weaknesses (max 4 bullets)
+5) Questions for authors (max 5 bullets)
+6) Reproducibility checklist (bullets)
+7) Score (1–10) + 1-line justification
+""")</code></pre>
+
+        <div class="note-box">The <code>INFO: Upserting 1 documents</code> log line confirms successful insertion. The rubric is stored as a single vector document addressable by semantic search queries like <code>"Paper Review Rubric Abrar"</code>.</div>
+
+        <h2 id="level2-soft">Soft vs. Deterministic Rubric Enforcement</h2>
+        <p>The notebook documents an important production failure mode: when <code>search_knowledge=True</code> is set, the agent <em>may or may not</em> retrieve the rubric depending on how it interprets the prompt. In practice, the Level 2 agent sometimes produces reviews that deviate from the rubric by adding extra sections ("Conclusion", "Recommendations") or omitting the score.</p>
+
+        <p>The solution introduced later in Level 2 is <strong>deterministic rubric injection</strong>: explicitly call <code>knowledge.search()</code> before every prompt and concatenate the rubric text into the prompt itself. This removes the model's decision of whether to retrieve — the rubric is always present.</p>
+
+        <pre><div class="code-header"><span>deterministic rubric injection (production-safe pattern)</span><span class="code-lang">python</span></div><code>retrieved = knowledge.search("Paper Review Rubric Abrar")
+rubric_text = "\n\n".join([r.content for r in retrieved])
+
+agent2.print_response(
+    f"""
+You MUST strictly follow this rubric:
+
+{rubric_text}
+
+Now review the following paper content:
+
+{paper_slice}
+
+Output MUST follow the rubric exactly. Do not add extra sections.
+Enforce bullet limits. Include score and reproducibility checklist.
+Write to review.md.
+""",
+    session_id="review_session_strict_1",
     stream=True,
 )</code></pre>
 
-          <p>With <code>stream=True</code>, I can watch the agent reason in real time: it calls <code>read_file</code>, gets back the paper text, thinks for a moment, then calls <code>write_file</code> with the full review. Finally it calls <code>list_files</code> to confirm the output exists. That three-step trace is visible in the Colab output.</p>
+        <h2 id="level2-output">Level 2 Review Output (with Deterministic Rubric)</h2>
+        <p>After forcing rubric injection, the Level 2 agent produces a noticeably sharper review compared to Level 1 — with specific metric citations (FID 3.17, Inception score) and more targeted weaknesses:</p>
 
-          <h2 id="l1-output">What the output looks like</h2>
-
-          <pre><div class="code-header"><span>review.md (excerpt)</span><span class="code-lang">markdown</span></div><code># Paper Review
-
-## Summary
-This paper introduces Denoising Diffusion Probabilistic Models (DDPMs), a class of
-latent variable models inspired by non-equilibrium thermodynamics. The authors define
-a fixed forward process that gradually adds Gaussian noise to data, and train a
-reverse process — parameterized by a neural network — to iteratively remove it.
-The main result is competitive image sample quality (FID 3.17 on CIFAR-10) combined
-with strong log-likelihood estimates, something GANs typically cannot achieve.
-
-## Contributions
-- A simplified training objective (predicting noise rather than the mean) that
-  outperforms the theoretically-motivated ELBO training.
-- Progressive lossy compression interpretation of the generative process.
-- State-of-the-art unconditional image synthesis on CIFAR-10 and 256×256 LSUN.
-
-## Strengths
-- Clean theoretical framework grounded in diffusion processes.
-- The noise-prediction reparameterization is an elegant insight.
-- Thorough ablation showing that the simplified loss drives the quality gain.
+        <div class="output-block"><pre>## Summary
+- Introduces diffusion probabilistic models for high-quality image synthesis.
+- Achieves state-of-the-art FID score of 3.17 on CIFAR10 dataset and comparable results on LSUN.
+- Utilizes a novel connection between diffusion models and denoising score matching.
+- Prescribes a progressive lossy decompression scheme generalizing autoregressive decoding.
+- Implementation available for reproduction.
 
 ## Weaknesses
-- Inference is slow: generating a single sample requires ~1000 denoising steps.
-- No comparison to score-based generative models despite close conceptual overlap.
-- Evaluation limited to CIFAR-10 and LSUN; no text-conditional or class-conditional
-  experiments that would demonstrate broader applicability.
+- Limited competitive log likelihoods compared to existing models.
+- May require extensive computational resources for training.
+- Insufficient ablation studies on the impact of model parameters on sample quality.
+- Threats to validity not heavily discussed, particularly bias and data leakage implications.
 
-## Questions for Authors
-- How does sample quality degrade if the number of inference steps is reduced to 50?
-- Is the noise schedule learned or fixed? Could adaptive schedules improve quality?
-- Have you tried the noise-prediction objective with continuous-time diffusion?
+## Score
+8/10 - Strong contribution with substantial practical implications but concerns about
+       log likelihood performance and validity.</pre></div>
 
-## Score: 8/10</code></pre>
+        <p>The mention of <strong>log likelihoods</strong>, <strong>ablation studies</strong>, and <strong>threats to validity</strong> are all direct outputs of the rubric's "what to prioritize" section being enforced in the prompt. This demonstrates that rubric-aware prompting generates more expert-aligned critique than unconstrained generation.</p>
 
-          <p>That's a real output from the agent on the DDPM paper. It gets the key contributions right, identifies the slow inference weakness (which did become a major research direction post-publication), and asks a genuinely pointed question about step reduction — exactly the kind of thing a reviewer should push on. Not bad for a model that was just handed a raw text file.</p>
+        <h2 id="level2-multi-turn">Multi-Turn Session Continuity</h2>
+        <p>The SQLite session store enables a follow-up prompt to iterate on the review without re-reading the paper. The session ID <code>"review_session_1"</code> is reused across calls:</p>
 
-          <h1 id="l1-arch-table">What this level can and can't do</h1>
+        <pre><div class="code-header"><span>multi-turn follow-up using session storage</span><span class="code-lang">python</span></div><code># First turn: generate initial review
+agent2.print_response(
+    "Read paper.txt and write the structured review to review.md. "
+    "Make sure benchmarking weaknesses are clearly emphasized.",
+    session_id="review_session_1",
+    stream=True,
+)
 
-          <table>
-            <tr><th>Capability</th><th>Level 1</th></tr>
-            <tr><td>Read a PDF and produce structured output</td><td>✅</td></tr>
-            <tr><td>Follow a review template consistently</td><td>✅</td></tr>
-            <tr><td>Remember your past reviews or corrections</td><td>❌</td></tr>
-            <tr><td>Apply a personal style guide or lab norms</td><td>❌</td></tr>
-            <tr><td>Handle multi-turn conversations about the paper</td><td>❌ (stateless)</td></tr>
-            <tr><td>Verify reproducibility or check baselines systematically</td><td>❌</td></tr>
-          </table>
+# Second turn: refine without re-reading the paper
+agent2.print_response(
+    "Rewrite the weaknesses section to be even sharper and more critical.",
+    session_id="review_session_1",   # same session → full history available
+    stream=True,
+)</code></pre>
 
-          <p>The gap between what it can and can't do is precisely what the next four levels address, one at a time.</p>
-
-          <h1 id="l1-lessons">Lessons from building this</h1>
-          <p>The biggest surprise was how much the instructions matter even at this simple level. My first version just said "review this paper" — the output was long, unstructured, and not very useful. Once I specified the exact section headers and told the agent to "focus on empirical evaluation," quality jumped noticeably. The model isn't guessing at what I want; it's following a spec. Writing that spec well is the work.</p>
-
-          <p>The second lesson: <code>stream=True</code> is invaluable during development. Watching the agent call tools in sequence — rather than just getting back a final response — makes it immediately obvious when it's doing something wrong, like reading the wrong file or skipping the write step entirely.</p>
-
-          <div class="note-box">
-            The Colab notebook linked above includes the full code, a sample paper (DDPM), and the generated <code>review.md</code>. You can substitute any PDF — just upload it to <code>/content/workspace/</code> before running the agent cell.
-          </div>
-
-          <div class="references">
-            <div class="ref-label">References</div>
-            <ol>
-              <li>Ho, J., Jain, A., & Abbeel, P. (2020). <em>Denoising Diffusion Probabilistic Models.</em> NeurIPS 2020. <a href="https://arxiv.org/abs/2006.11239" target="_blank">arxiv.org/abs/2006.11239</a></li>
-              <li>Agno Framework. <em>Building Agents with Tools.</em> <a href="https://docs.agno.com" target="_blank">docs.agno.com</a></li>
-            </ol>
-          </div>
-
-        </div><!-- /panel-1 -->
-
-        <!-- ============================= LEVEL 2 ============================= -->
-        <div class="level-panel" id="panel-2">
-          <div class="part-divider">
-            <div class="part-title">Level 2 — Storage + Knowledge</div>
-          </div>
-          <div class="wip-panel">
-            <div class="wip-icon">🔨</div>
-            <h3>Work in Progress</h3>
-            <p>Level 2 adds session storage so multi-turn reviewing works, and a personal knowledge base — review templates, venue norms, example reviews — that the agent automatically searches before writing. Coming soon.</p>
-          </div>
+        <!-- ===================== PART 4 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 4: Level 3 — Learned Behavioral Memory</div>
         </div>
 
-        <!-- ============================= LEVEL 3 ============================= -->
-        <div class="level-panel" id="panel-3">
-          <div class="part-divider">
-            <div class="part-title">Level 3 — Memory + Learning</div>
-          </div>
-          <div class="wip-panel">
-            <div class="wip-icon">🧠</div>
-            <h3>Coming Soon</h3>
-            <p>Level 3 adds persistent, learned preferences. Correct the agent once in Session 1 — it stores the correction and applies it automatically in Session 2 without you having to say it again.</p>
-          </div>
+        <h1 id="level3">Level 3: The Agent Learns Across Sessions</h1>
+        <div class="level-badge l3">Level 3</div>
+
+        <p>Level 3 introduces a second ChromaDB collection — <code>paper-review-learnings</code> — dedicated to capturing learned preferences. Unlike the static knowledge base, this store is updated by the agent itself during runs. The Agno <code>LearningMachine</code> component manages this autonomously in <code>AGENTIC</code> mode: the agent decides what behavioral patterns are worth persisting.</p>
+
+        <pre><div class="code-header"><span>Level 3 agent with LearningMachine</span><span class="code-lang">python</span></div><code>agent3 = Agent(
+    name="PaperReviewer",
+    model=OpenAIResponses(id="gpt-4o-mini"),
+    instructions="You are a paper reviewing agent. Follow rubric strictly.",
+    tools=[CodingTools(base_dir=WORKSPACE, all=True)],
+    knowledge=knowledge,           # static rubric store
+    search_knowledge=True,
+    db=db,
+    add_history_to_context=True,
+    learning=LearningMachine(
+        knowledge=learned_knowledge,
+        learned_knowledge=LearnedKnowledgeConfig(
+            mode=LearningMode.AGENTIC,  # agent decides when to store
+        ),
+    ),
+    enable_agentic_memory=True,    # persist user preferences
+    markdown=True,
+)</code></pre>
+
+        <h2 id="level3-preference">Teaching a Persistent Preference</h2>
+        <p>The notebook teaches the agent a specific formatting preference — that every Weaknesses section should begin with a bullet prefixed <code>Critical:</code> identifying the single most important weakness. This is expressed once in a session, and the LearningMachine stores it so it applies in all future sessions without being restated.</p>
+
+        <pre><div class="code-header"><span>injecting a learnable preference</span><span class="code-lang">python</span></div><code>agent3.print_response(
+    f"""
+Paper content (partial):
+{paper_slice}
+
+New long-term preference (remember this for future sessions):
+- In the Weaknesses section, the FIRST bullet must start with 'Critical:'
+  and state the single most important weakness.
+
+Now write the full structured review to review.md following the stored rubric,
+and apply that 'Critical:' rule.
+""",
+    session_id="learn_session_1",
+    stream=True,
+)</code></pre>
+
+        <h2 id="level3-recall">Recalled Preference in Subsequent Sessions</h2>
+        <p>In <code>learn_session_2</code> and <code>learn_session_3</code>, the agent applies the <code>Critical:</code> prefix without it being re-stated in the prompt — it is retrieved from the learned memory store automatically. The output log shows <code>INFO Found 1 documents</code> confirming a successful knowledge retrieval before generation.</p>
+
+        <h2 id="level3-two-stores">Two Separate Vector Stores</h2>
+        <p>A key architectural decision in Level 3 is maintaining <em>two separate ChromaDB collections</em>. The static knowledge store contains the review rubric — rules that never change. The learned memory store contains user-specific behavioral adaptations — rules that the agent accumulates over time. This separation prevents learned preferences from contaminating or overwriting the canonical rubric.</p>
+
+        <table>
+          <tr><th>Store</th><th>Collection</th><th>Populated by</th><th>Content</th></tr>
+          <tr><td>Static knowledge</td><td><code>paper-review-knowledge</code></td><td>Developer (manually seeded)</td><td>Review rubric, style guide, priorities</td></tr>
+          <tr><td>Learned memory</td><td><code>paper-review-learnings</code></td><td>Agent (autonomously written)</td><td>User preferences, formatting corrections, session patterns</td></tr>
+        </table>
+
+        <!-- ===================== PART 5 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 5: Level 4 — Multi-Agent Review Committee</div>
         </div>
 
-        <!-- ============================= LEVEL 4 ============================= -->
-        <div class="level-panel" id="panel-4">
-          <div class="part-divider">
-            <div class="part-title">Level 4 — Multi-Agent Team</div>
-          </div>
-          <div class="wip-panel">
-            <div class="wip-icon">🤝</div>
-            <h3>Coming Soon</h3>
-            <p>Level 4 splits the work across four specialist agents — Summarizer, Critic, Repro Checker, and a Meta-Reviewer that merges their outputs into a final review. The specialists are read-only; only the leader writes files.</p>
-          </div>
+        <h1 id="level4">Level 4: Decomposing the Task Across Specialized Agents</h1>
+        <div class="level-badge l4">Level 4</div>
+
+        <p>Level 4 introduces role specialization by decomposing the monolithic reviewer into three agents coordinated by an Agno <code>Team</code> object. This mirrors how real academic review committees operate: a summarizer establishes facts, a critic identifies problems, and a meta-reviewer synthesizes both perspectives into a final judgment.</p>
+
+        <pre><div class="code-header"><span>three specialized agents + team orchestrator</span><span class="code-lang">python</span></div><code># Role 1: Extract what the paper does
+summarizer = Agent(
+    name="Summarizer",
+    role="Extract key contributions and summary from the paper.",
+    model=OpenAIResponses(id="gpt-4o-mini"),
+    markdown=True,
+)
+
+# Role 2: Find what the paper gets wrong
+critic = Agent(
+    name="Critic",
+    role="Identify weaknesses, missing baselines, threats to validity, benchmarking gaps.",
+    model=OpenAIResponses(id="gpt-4o-mini"),
+    markdown=True,
+)
+
+# Role 3: Synthesize into a rubric-compliant final review
+meta_reviewer = Agent(
+    name="MetaReviewer",
+    role="Combine inputs into a final structured review following rubric strictly.",
+    model=OpenAIResponses(id="gpt-4o-mini"),
+    markdown=True,
+)
+
+coding_team = Team(
+    name="Paper Review Committee",
+    members=[summarizer, critic, meta_reviewer],
+    instructions=(
+        "Workflow:\n"
+        "1) Summarizer analyzes paper and produces summary + contributions.\n"
+        "2) Critic analyzes paper and produces weaknesses + benchmarking gaps.\n"
+        "3) MetaReviewer combines both outputs into final structured review "
+        "following Abrar's rubric strictly."
+    ),
+    show_members_responses=True,   # expose intermediate reasoning
+    markdown=True,
+)</code></pre>
+
+        <h2 id="level4-workflow">Team Workflow</h2>
+
+        <div class="pipeline">
+          <div class="pipeline-step">Paper slice (12,000 chars)</div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">Summarizer → Summary + Contributions</div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">Critic → Weaknesses + Benchmarking Gaps</div>
+          <div class="pipeline-arrow">→</div>
+          <div class="pipeline-step">MetaReviewer → Final structured review</div>
         </div>
 
-        <!-- ============================= LEVEL 5 ============================= -->
-        <div class="level-panel" id="panel-5">
-          <div class="part-divider">
-            <div class="part-title">Level 5 — Production System</div>
-          </div>
-          <div class="wip-panel">
-            <div class="wip-icon">🚀</div>
-            <h3>Coming Soon</h3>
-            <p>Level 5 wraps everything in a FastAPI endpoint: upload a PDF, get back <code>review.md</code> and JSON rubric scores. Full tracing and logging of tool calls and retrieved knowledge chunks included.</p>
-          </div>
+        <h2 id="level4-rubric">Rubric Injection for the Team</h2>
+        <p>The same deterministic injection pattern used in Level 2 is applied at the team level — the rubric is fetched from the knowledge store and embedded directly into the team prompt to prevent MetaReviewer free-styling outside the required format:</p>
+
+        <pre><div class="code-header"><span>deterministic rubric injection for multi-agent team</span><span class="code-lang">python</span></div><code>rubric_docs = knowledge.search("Paper Review Rubric (Abrar)")
+rubric_text = "\n\n".join([d.content for d in rubric_docs])
+
+coding_team.print_response(
+    f"""
+STRICT REQUIREMENT:
+The final answer MUST follow this rubric exactly (no extra sections, enforce bullet limits):
+
+{rubric_text}
+
+Team workflow:
+- Summarizer: produce Summary + Contributions only (rubric-compliant).
+- Critic: produce Strengths + Weaknesses + Questions only (rubric-compliant).
+- MetaReviewer: output the FINAL full review matching the rubric exactly, and NOTHING else.
+""",
+    stream=True,
+)</code></pre>
+
+        <div class="note-box">The <code>show_members_responses=True</code> flag is a useful debugging tool during development — it exposes each agent's intermediate output so you can verify that the Summarizer stays in its lane and doesn't pre-empt the MetaReviewer's synthesis step.</div>
+
+        <h2 id="level4-tradeoffs">Level 4 Tradeoffs</h2>
+        <p>Multi-agent decomposition increases parallelism potential and forces separation of concerns but also multiplies API calls and introduces coordination overhead. For a well-scoped, single-document task like paper reviewing, a single capable agent (Level 2/3 with deterministic rubric injection) may outperform a committee on latency and cost. The team architecture becomes most valuable when subtasks require genuinely different expertise or when independent verification is needed.</p>
+
+        <table>
+          <tr><th>Approach</th><th>API calls</th><th>Latency</th><th>Intermediate visibility</th><th>Structural consistency</th></tr>
+          <tr><td>Level 1 (single, soft rubric)</td><td>1</td><td>Low</td><td>None</td><td>❌ Variable</td></tr>
+          <tr><td>Level 2 (single, det. rubric)</td><td>1–2</td><td>Low</td><td>None</td><td>✅ Reliable</td></tr>
+          <tr><td>Level 4 (committee)</td><td>3+</td><td>Higher</td><td>✅ Full</td><td>✅ Reliable (enforced)</td></tr>
+        </table>
+
+        <!-- ===================== PART 6 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 6: Level 5 — Production FastAPI Service</div>
         </div>
 
-        <a class="back-link" href="../index.html">← Back to Notebook</a>
-      </div><!-- /article-body -->
+        <h1 id="level5">Level 5: Wrapping Everything as an HTTP Service</h1>
+        <div class="level-badge l5">Level 5</div>
+
+        <p>Level 5 converts the notebook workflow into a deployable HTTP endpoint using <strong>FastAPI</strong> and <strong>uvicorn</strong>. No agent logic changes — this is purely a service wrapper. The key design decisions are: use the Level 3 agent (single-agent with learned memory is most reliable for API use), enforce the rubric deterministically at the endpoint level, and implement a <code>max_chars</code> parameter to provide explicit cost control.</p>
+
+        <pre><div class="code-header"><span>FastAPI endpoint definition</span><span class="code-lang">python</span></div><code>from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI(title="PaperReview API", version="0.1")
+
+class ReviewRequest(BaseModel):
+    paper_text: str
+    session_id: str = "api_session_1"
+    max_chars: int = 12000          # token/cost control
+
+@app.post("/review")
+def review(req: ReviewRequest):
+    # 1) Deterministic rubric injection
+    rubric_docs = knowledge.search("Paper Review Rubric")
+    rubric_text = "\n\n".join([d.content for d in rubric_docs]) if rubric_docs else ""
+
+    # 2) Token/cost control — slice paper text
+    paper_slice = (req.paper_text or "")[: req.max_chars]
+
+    # 3) Run Level 3 agent
+    agent3.print_response(
+        f"""You MUST follow this rubric exactly:
+
+{rubric_text}
+
+Paper content:
+{paper_slice}
+
+Write the full structured review to review.md in the workspace.""",
+        session_id=req.session_id,
+        stream=False,
+    )
+
+    # 4) Return generated review as JSON
+    review_path = Path(WORKSPACE) / "review.md"
+    review_md = review_path.read_text(encoding="utf-8") if review_path.exists() else ""
+    return {"session_id": req.session_id, "review_md": review_md}</code></pre>
+
+        <h2 id="level5-test">Live API Test</h2>
+        <p>The server is started on <code>0.0.0.0:8000</code> using <code>nest_asyncio</code> (to allow uvicorn in a Colab event loop) and immediately tested with a <code>requests.post</code> call from the same notebook. The HTTP 200 response confirms the full stack is operational end-to-end:</p>
+
+        <div class="output-block"><pre>INFO  Found 1 documents
+INFO  Wrote review.md
+INFO  127.0.0.1:35708 - "POST /review HTTP/1.1" 200 OK
+Status: 200
+Session: api_test_1</pre></div>
+
+        <h2 id="level5-api-output">API-Generated Review (first 800 chars)</h2>
+        <div class="output-block"><pre># Paper Review of Denoising Diffusion Probabilistic Models
+
+## Summary
+- Presents high-quality image synthesis using diffusion probabilistic models.
+- Achieves state-of-the-art Inception score (9.46) and FID score (3.17) on CIFAR10.
+- Connection between diffusion models and denoising score matching enables a novel training bound.
+- Proposes a progressive lossy decompression scheme akin to autoregressive decoding.
+
+## Contributions
+- Demonstrates that diffusion models can generate high-quality samples.
+- Establishes a new link with denoising score matching, enhancing model training.
+- Introduces an efficient sampling technique that resembles autoregressive decoding.</pre></div>
+
+        <div class="success-box">The API-generated review is the most precise of all outputs across the five levels. It correctly cites both the Inception score (9.46) and the FID score (3.17) from the CIFAR10 experiments — specific quantitative results that the Level 1 agent omitted entirely. This improvement is attributable to the combination of deterministic rubric enforcement, the Level 3 agent's learned preference for specificity, and the cleaner, more focused prompt structure in the service layer.</div>
+
+        <!-- ===================== PART 7 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 7: Review Quality Progression Across Levels</div>
+        </div>
+
+        <h1 id="quality">How Review Quality Evolved Across Five Levels</h1>
+
+        <p>One of the most informative aspects of the notebook is the ability to compare review outputs across all five levels for the same input paper. The progression shows a clear qualitative improvement driven not by model capability changes (all levels use <code>gpt-4o-mini</code>) but by <em>architectural choices</em> — prompting strategy, knowledge retrieval, and memory.</p>
+
+        <table>
+          <tr><th>Level</th><th>Weaknesses Section Quality</th><th>Metric Citations</th><th>Rubric Compliance</th></tr>
+          <tr><td>Level 1</td><td>Generic ("lack of detailed analysis")</td><td>❌ None</td><td>⚠️ Soft</td></tr>
+          <tr><td>Level 2 (soft)</td><td>Adds "log likelihood" mention but shallow</td><td>⚠️ Partial</td><td>⚠️ Unreliable</td></tr>
+          <tr><td>Level 2 (det.)</td><td>Ablation studies, threats to validity named</td><td>✅ FID 3.17</td><td>✅ Enforced</td></tr>
+          <tr><td>Level 3</td><td>First bullet: <em>Critical:</em> prefix, sharper framing</td><td>✅ FID + IS</td><td>✅ Enforced</td></tr>
+          <tr><td>Level 5 (API)</td><td>Most specific — names both scores + limitations</td><td>✅ IS 9.46, FID 3.17</td><td>✅ Enforced</td></tr>
+        </table>
+
+        <h2 id="key-findings">Key Findings</h2>
+
+        <p><strong>Deterministic rubric injection is the highest-leverage single change.</strong> Moving from soft knowledge retrieval (hoping the model searches the knowledge base) to hard injection (always putting the rubric in the prompt) is responsible for the largest quality jump in the notebook. The model does not reliably choose to retrieve relevant context on its own — developers must architect that retrieval as a guaranteed step.</p>
+
+        <p><strong>Knowledge base content quality matters more than retrieval mechanism.</strong> The rubric's "what to prioritize" section is written with specific analytical directives: check for missing baselines, look for data leakage, identify metric misuse. These directives directly appear as weaknesses cited in the output (log likelihoods, ablation gaps, threats to validity). A vague rubric would have produced vague reviews regardless of retrieval reliability.</p>
+
+        <p><strong>Learned memory is useful for style, not substance.</strong> The <code>Critical:</code> preference is a formatting rule, not a factual claim about the paper. Level 3's learned memory is best suited to this category: persistent user-specific behavioral patterns (formatting rules, tone preferences, output style conventions). It should not be expected to learn analytical judgments about specific papers.</p>
+
+        <p><strong>The multi-agent committee (Level 4) is architecturally interesting but not clearly superior for this task.</strong> For paper reviewing specifically, the Summarizer-Critic-MetaReviewer decomposition multiplies API calls without clear quality gains over a single well-prompted agent. The committee becomes more valuable in scenarios where the critic and summarizer genuinely need different input (e.g., access to different sections of a long document, or different domain expertise).</p>
+
+        <!-- ===================== PART 8 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 8: Engineering Patterns and Lessons</div>
+        </div>
+
+        <h1 id="patterns">Reusable Engineering Patterns</h1>
+
+        <h2 id="pattern-inject">Pattern 1: Deterministic Context Injection</h2>
+        <p>Never rely on the model to decide whether to retrieve relevant context. For any rule, constraint, or standard that must always apply, fetch it programmatically and concatenate it into every prompt. This is the primary reliability mechanism used throughout the notebook.</p>
+
+        <pre><div class="code-header"><span>production-safe pattern — always inject, never hope for retrieval</span><span class="code-lang">python</span></div><code># WRONG: soft retrieval — model may or may not search
+agent = Agent(..., search_knowledge=True)
+agent.print_response("Review this paper following my rubric.")
+
+# RIGHT: deterministic injection — rubric always present
+rubric_docs = knowledge.search("Paper Review Rubric")
+rubric_text = "\n\n".join([d.content for d in rubric_docs])
+agent.print_response(f"You MUST follow this rubric:\n{rubric_text}\n\nPaper:\n{paper_slice}")</code></pre>
+
+        <h2 id="pattern-slice">Pattern 2: Controlled Token/Cost Slicing</h2>
+        <p>The notebook consistently slices the paper text to a fixed character limit (12,000–20,000 chars) before passing it to the model. This provides cost predictability and prevents prompt overflow. At the API level, this is exposed as a configurable <code>max_chars</code> parameter in the request schema.</p>
+
+        <h2 id="pattern-two-stores">Pattern 3: Separate Static and Dynamic Knowledge Stores</h2>
+        <p>Using two ChromaDB collections — one for developer-defined rubrics and one for agent-learned preferences — prevents learned behaviors from corrupting canonical rules. Static rules go in the knowledge store; user-specific adaptations go in the learned store. The distinction is: <em>rules you control</em> vs. <em>patterns the agent discovers</em>.</p>
+
+        <h2 id="pattern-inspect">Pattern 4: Inspect-Before-Act Shell Pattern</h2>
+        <p>The Level 1 agent's behavior of calling <code>file paper.txt</code> before reading it is an agentic best practice that emerged from the prompt instruction "Never assume file type." In production agents, always verify preconditions before acting — check that a file exists, is non-empty, and is the expected type before attempting to process it.</p>
+
+        <h2 id="pattern-session">Pattern 5: Explicit Session IDs for Auditability</h2>
+        <p>All agent calls in the notebook use explicit <code>session_id</code> strings (<code>"review_session_1"</code>, <code>"learn_session_2"</code>, etc.). This is essential for debugging and auditing in production — it makes every agent run traceable in the SQLite store and allows precise replay of any session's history.</p>
+
+        <h1 id="limitations">Observed Limitations</h1>
+
+        <p>Several limitations are documented explicitly or implicitly in the notebook outputs. The 12,000-character text slice covers roughly the first 10–12 pages of the paper, which means later experimental sections (including full quantitative comparisons on LSUN and the ablation tables) may not be in the model's context window. Reviews generated from partial context will have blind spots.</p>
+
+        <p>The <code>gpt-4o-mini</code> model is cost-efficient but produces reviews that — even at their best — stay at the level of a technically informed graduate student rather than a domain expert. The model does not independently verify statistical claims, does not check citation accuracy, and does not cross-reference results against the broader literature. The rubric mitigates this by directing attention to known weak spots, but cannot substitute for genuine domain knowledge.</p>
+
+        <p>The Level 4 multi-agent team produced no visible intermediate output in the notebook trace (only <code>Output()</code> is logged for team runs). This suggests the <code>show_members_responses=True</code> flag may not work reliably in a Colab streaming context, making the multi-agent workflow harder to debug than single-agent runs.</p>
+
+        <div class="warning-box">The notebook includes <code>WARNING: CodingTools can run arbitrary shell commands, please provide human supervision.</code> This warning from the Agno framework is worth heeding. In the notebook context, the agent has shell access scoped to <code>/content/workspace</code>, which limits blast radius. In a production deployment, the service layer (Level 5) should implement explicit sandboxing or replace <code>CodingTools</code> with purpose-built read/write tools that do not expose shell execution.</div>
+
+        <!-- ===================== PART 9 ===================== -->
+        <div class="part-divider">
+          <div class="part-title">Part 9: Summary</div>
+        </div>
+
+        <h1 id="summary">The Complete Mental Model</h1>
+
+        <pre><div class="code-header"><span>Paper Reviewer Agent — full system in one view</span><span class="code-lang">text</span></div><code>INPUT
+  PDF → pypdf → paper.txt (56,805 chars)
+  Slice to 12,000–20,000 chars for context control
+
+LEVEL 1 — Stateless tool agent
+  gpt-4o-mini + CodingTools
+  inspect (file, ls) → read (cat) → write (review.md)
+  Output: correct structure, generic critique
+
+LEVEL 2 — Persistence + Knowledge
+  + SQLite (session continuity)
+  + ChromaDB hybrid search (static rubric)
+  Key insight: deterministic injection > soft retrieval
+  Output: rubric-compliant, metric-aware critique
+
+LEVEL 3 — Learned Memory
+  + Second ChromaDB (learned preferences, AGENTIC mode)
+  Stores: "Critical:" bullet rule, session-specific patterns
+  Output: consistent formatting across sessions, sharpened weaknesses
+
+LEVEL 4 — Multi-Agent Committee
+  Team(Summarizer, Critic, MetaReviewer)
+  Separation of concerns: extract → critique → synthesize
+  Tradeoff: 3× API calls, higher latency, no clear quality gain for this task
+
+LEVEL 5 — Production Service
+  FastAPI POST /review
+  Rubric injected deterministically at endpoint level
+  max_chars parameter for cost control
+  Returns JSON: {session_id, review_md}
+  HTTP 200 confirmed on live test
+
+FINAL REVIEW QUALITY
+  Inception score 9.46, FID 3.17 cited ✅
+  All 7 rubric sections present with bullet limits ✅
+  Log likelihood weakness identified ✅
+  Ablation gaps flagged ✅</code></pre>
+
+        <h1 id="verdict">Verdict on the Paper Under Review</h1>
+        <p>The agent's most refined output — from the Level 5 API — gives <em>Denoising Diffusion Probabilistic Models</em> a score of <strong>8/10</strong>. The agent correctly identifies the paper's central strength (the novel DDPM–score matching connection backed by strong empirical results) and its primary weakness (non-competitive log likelihoods despite high sample quality). The reproducibility checklist is accurate: the authors released code and the training setup is clearly described. The score is consistent and defensible, though a human expert reviewer would likely engage more deeply with the rate–distortion analysis and the specific choice of the fixed forward process variance schedule.</p>
+
+        <div class="references">
+          <div class="ref-label">References</div>
+          <ol>
+            <li>Ho, J., Jain, A., &amp; Abbeel, P. (2020). <em>Denoising Diffusion Probabilistic Models.</em> NeurIPS 2020. <a href="https://arxiv.org/abs/2006.11239" target="_blank">arxiv.org/abs/2006.11239</a></li>
+            <li>Agno Framework Documentation. <a href="https://docs.agno.com" target="_blank">docs.agno.com</a></li>
+            <li>ChromaDB Documentation. <a href="https://docs.trychroma.com" target="_blank">docs.trychroma.com</a></li>
+            <li>FastAPI Documentation. <a href="https://fastapi.tiangolo.com" target="_blank">fastapi.tiangolo.com</a></li>
+            <li>OpenAI Embeddings. <code>text-embedding-3-small</code>. <a href="https://platform.openai.com/docs/models" target="_blank">platform.openai.com/docs/models</a></li>
+          </ol>
+        </div>
+      </div>
     </article>
   </main>
 
   <aside class="sidebar">
-    <div id="sidebar-toc">
-      <div class="toc-title">Level 1 Contents</div>
-      <ul class="toc" id="toc-list">
-        <li><a onclick="tocScroll('l1-intro')">What I'm building</a></li>
-        <li><a onclick="tocScroll('l1-arch')">Architecture</a></li>
-        <li><a onclick="tocScroll('l1-tools')">The tools</a></li>
-        <li class="toc-h2"><a onclick="tocScroll('l1-setup')">Environment setup</a></li>
-        <li class="toc-h2"><a onclick="tocScroll('l1-extract')">Step 1: Extract PDF</a></li>
-        <li class="toc-h2"><a onclick="tocScroll('l1-agent')">Step 2: Define agent</a></li>
-        <li class="toc-h2"><a onclick="tocScroll('l1-run')">Step 3: Run it</a></li>
-        <li class="toc-h2"><a onclick="tocScroll('l1-output')">Output</a></li>
-        <li><a onclick="tocScroll('l1-arch-table')">Capabilities</a></li>
-        <li><a onclick="tocScroll('l1-lessons')">Lessons</a></li>
-      </ul>
-    </div>
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc">
+      <li class="toc-part">System Architecture</li>
+      <li><a onclick="tocScroll('overview')">Five-Level Overview</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('paper-target')">Target Paper</a></li>
+
+      <li class="toc-part">Level 1: Tool Agent</li>
+      <li><a onclick="tocScroll('level1')">Stateless Reviewer</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level1-execution')">Execution Trace</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level1-output')">Review Output</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level1-analysis')">Analysis</a></li>
+
+      <li class="toc-part">Level 2: Knowledge</li>
+      <li><a onclick="tocScroll('level2')">Persistence + Rubric</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level2-storage')">SQLite Storage</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level2-knowledge')">ChromaDB Rubric</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level2-soft')">Soft vs. Deterministic</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level2-output')">Review Output</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level2-multi-turn')">Multi-Turn</a></li>
+
+      <li class="toc-part">Level 3: Memory</li>
+      <li><a onclick="tocScroll('level3')">Learned Preferences</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level3-preference')">Teaching a Preference</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level3-two-stores')">Two Vector Stores</a></li>
+
+      <li class="toc-part">Level 4: Committee</li>
+      <li><a onclick="tocScroll('level4')">Multi-Agent Team</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level4-workflow')">Team Workflow</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level4-tradeoffs')">Tradeoffs</a></li>
+
+      <li class="toc-part">Level 5: API</li>
+      <li><a onclick="tocScroll('level5')">FastAPI Service</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level5-test')">Live API Test</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('level5-api-output')">API Output</a></li>
+
+      <li class="toc-part">Analysis</li>
+      <li><a onclick="tocScroll('quality')">Quality Progression</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('key-findings')">Key Findings</a></li>
+      <li><a onclick="tocScroll('patterns')">Engineering Patterns</a></li>
+      <li class="toc-h2"><a onclick="tocScroll('limitations')">Limitations</a></li>
+
+      <li class="toc-part">Summary</li>
+      <li><a onclick="tocScroll('summary')">Full Picture</a></li>
+      <li><a onclick="tocScroll('verdict')">Verdict</a></li>
+    </ul>
   </aside>
 </div>
 
@@ -489,38 +870,15 @@ with strong log-likelihood estimates, something GANs typically cannot achieve.
 </footer>
 
 <script>
-  function showLevel(n) {
-    // Only level 1 is interactive
-    if (n !== 1) return;
-
-    // Update cards
-    for (let i = 1; i <= 5; i++) {
-      const card = document.getElementById('card-' + i);
-      if (card && !card.classList.contains('wip')) {
-        card.classList.toggle('active', i === n);
-      }
-    }
-
-    // Update panels
-    for (let i = 1; i <= 5; i++) {
-      const panel = document.getElementById('panel-' + i);
-      if (panel) panel.classList.toggle('active', i === n);
-    }
-  }
-
   function tocScroll(id) {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
   }
-
   window.addEventListener('scroll', () => {
     const headings = document.querySelectorAll('.article-body h1[id], .article-body h2[id]');
     let active = null;
     headings.forEach(h => { if (h.getBoundingClientRect().top < 95) active = h.id; });
     document.querySelectorAll('.toc a').forEach(a => {
-      const onclick = a.getAttribute('onclick') || '';
-      const match = onclick.match(/tocScroll\('(.+?)'\)/);
-      if (match) a.classList.toggle('active', match[1] === active);
+      a.classList.toggle('active', a.getAttribute('onclick') === `tocScroll('${active}')`);
     });
   }, { passive: true });
 </script>
