@@ -224,7 +224,7 @@ t=1000: pure noise</code></pre>
         <p>Naively computing $x_t$ requires $t$ sequential steps: $x_0\to x_1\to \dots\to x_t$.</p>
 
         <h2 id="closed-form">Closed-Form Expression</h2>
-        <p>We can jump directly from $x_0$ to $x_t$:</p>
+        <p>We can jump directly from $x_0$ to $x_t$, instead of going through all the intermediate steps $x_1, x_2, \ldots x_{t-1}$:</p>
         <p><strong>$$q(x_t\mid x_0)=\mathcal{N}\!\left(x_t;\sqrt{\bar\alpha_t}\,x_0,\,(1-\bar\alpha_t)I\right)$$</strong></p>
         <p>Equivalently:</p>
         <p><strong>$$x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon,\qquad \varepsilon\sim\mathcal{N}(0,I)$$</strong></p>
@@ -296,7 +296,7 @@ x2 = √(1-β2) x1 + √β2 ε2
           <li><strong>Markov:</strong> $q(x_t\mid x_{t-1},\dots,x_0)=q(x_t\mid x_{t-1})$</li>
           <li><strong>Fixed:</strong> fully defined by $(x_0,\{\beta_t\},\varepsilon)$; no learning required</li>
           <li><strong>Gaussian:</strong> $q(x_t\mid x_0)$ is Gaussian for all $t$</li>
-          <li><strong>Converges:</strong> $x_t \to \mathcal{N}(0,I)$ for large $t$ with all traces of the original signal $x_0 \sim q gone$</li>
+          <li><strong>Converges:</strong> $x_t \to \mathcal{N}(0,I)$ for large $t$ with all traces of the original signal $x_0 \sim q$ gone</li>
         </ul>
 
         <h1 id="timeline">Visual Timeline</h1>
