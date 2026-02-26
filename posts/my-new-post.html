@@ -329,7 +329,8 @@ t=1000  ᾱ≈0.00    [░░░░░░░░░░░░░░░░░░░
         </div>
 
         <h1 id="overview-reverse">Overview</h1>
-        <p>The reverse process is the <strong>"hard" direction</strong> in diffusion models — learning to remove noise and generate realistic images. This is where the neural network comes into picture.</p>
+        <p>The reverse process is the <strong>"hard" direction</strong> in diffusion models — learning to remove noise and generate realistic images. This is where the neural network comes into picture.The key idea is to use a neural network parametrized by $\theta$. 
+The network takes two arguments $(x_t, t)$ and outputs a vector  $\mu_\theta(x_t, t)$ and a matrix $\Sigma_\theta(x_t, t)$, such that each step in the forward diffusion process can be approximately undone. </p>
 
         <h2 id="goal-reverse">The Goal</h2>
         <p>We want to reverse the forward process:</p>
